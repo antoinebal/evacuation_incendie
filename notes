@@ -1,0 +1,20 @@
+NOTES : 
+
+
+---- Important : voir si la solution est viable : 
+
+	COmmencer à partir d'une feuille à évacuer : 
+créer  un evenement à propager selon les valeurs de chaque arc traversé !  
+
+Ex : 
+
+feuille avec 20 personne a évacuer par paquet de 5 : 
+Commence à la date 0 : 
+	evenement : (0,5)  --> part au temps 0 et par paquet de 5  !! on fait donc 4 paquet
+	
+-- arc avec 5 de taux evacuation et 5 de duree 
+		--> (0+4,(-5)) 
+
+et voir comment se propage ! un evenemnt d'entree et un de sortie pour chaque sommet !!! (la sortie d'un sera la sortie d'un autre ) et chemin d'evenemnt pour chaque feuille 
+après on trie tout ces evenement en fonction du temps (premier valeur du tuple) et vérfiie qu'on dépasse jamais la capacité a un temps donné pour la somme du 2e valeur tuple présent a cette unité de tps 
+
