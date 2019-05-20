@@ -6,6 +6,7 @@ import java.lang.Comparable;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.TreeMap;
 
 public class Checker {
 
@@ -27,30 +28,32 @@ public class Checker {
 		 
 	}
 	*/
+	
 	public class Noeud {
 	int id;
-	AVL<Integer, Integer> avl;
+	TreeMap<Integer, Integer> avl;
 	
 	Noeud(int id) {
 		this.id=id;
-		avl = new AVL<Integer, Integer>();
+		avl = new TreeMap<Integer, Integer>();
 	}
 	
 	void addEvent(int date, int flux) {
-		avl.insert(date, flux);
+		avl.put(date, flux);
 	}
+	int getID() {return id;}
+	TreeMap<Integer, Integer> getAVL() {return avl;}
 	}
 	
 	
 	public Checker (String fileName){
-		    FileAgent fa = new FileAgent(fileName);
 		    try {
+		    	//on construit la forêt et la solution
+		    	FileAgent fa = new FileAgent(fileName);
 				solution = fa.processLineByLineSolution();
-
 				FileAgent fa2 = new FileAgent("../InstancesInt/"+solution.nomInstance);
 				foret=fa2.processLineByLineForest();
 			} catch (IOException e) {
-				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
 	 	  }
@@ -59,7 +62,7 @@ public class Checker {
 		
 		
 		boolean ok = true ; 
-		//
+		//I : le nombre de feuilles est il correct?
 		if (solution.nbFeuilleEvac > foret.nbFeuille) { 
 			ok = false ;
 			System.out.println("Erreur : nombre de feuilles à évacuer plus grand que le nombre de feuilles de la forêt!"); 
@@ -94,9 +97,7 @@ public class Checker {
 				int txEvacSol = solution.feuilles.get(i).tauxEvac ; 
 				int debut = solution.feuilles.get(i).dateDebut ;  
 				int idFeuille = solution.feuilles.get(i).id ; 	
-				
-				
-				
+								
 				//on récup le chemin d'évac
 				Chemin cheminEvac = foret.recupChemin(idFeuille);
 				
@@ -104,8 +105,8 @@ public class Checker {
 				Sommet feuille = cheminEvac.feuille;
 				
 				//on récup l'arc entre la feuille et le premier sommet du chemin d'évac
-				Sommet premierSommet = cheminEvac.getNoeudAt(0);
-				Arc arc = foret.recupArc(idFeuille, premierSommet.getId());
+				Sommet sommetSuivant = cheminEvac.getNoeudAt(0);
+				Arc arc = foret.recupArc(idFeuille, sommetSuivant.getId());
 				
 				//on vérifie bien que le taux < capa arc
 				if (txEvacSol > arc.getCapa()) {
@@ -125,7 +126,7 @@ public class Checker {
 					int cptPopulation=feuille.getPop();
 					
 					//on crée le noeud de l'autre côté du chemin
-					Noeud noeud = new Noeud(premierSommet.getId());
+					Noeud noeud = new Noeud(sommetSuivant.getId());
 					noeuds.add(noeud);
 					
 					//variable à être incrémentée
@@ -139,8 +140,7 @@ public class Checker {
 					/*
 					 * il reste peut être quelques personnes à passer, dont le nombre
 					 * est inférieur au taux
-					 */
-					
+					 */				
 					if (cptPopulation != 0) {
 						noeud.addEvent(temps, cptPopulation);
 					}
@@ -161,6 +161,7 @@ public class Checker {
 			
 		
 		}
+		return ok;
 		
 	} 
 		
