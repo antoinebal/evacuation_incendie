@@ -127,9 +127,9 @@ public class FileAgent {
 			      }      
 			    }
 			    
-			    return solution;Name);
+			    return solution;
 			  }
-			  }
+			  
 		 
 		 
 		 protected void processLineSolution(String line) { 

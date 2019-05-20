@@ -18,6 +18,10 @@ public class Chemin {
 	
 	void setTaille(int taille) {this.taille = taille;}
 	
+	Sommet getFeuille() {return feuille;}
+	
+	Sommet getNoeudAt(int index) {return chemin.get(index);}
+	
 	public void printChemin() {
 		System.out.println("Feuille : "+feuille.id_+" ; max pack : "+feuille.maxPack_+" ; nb personnes : "+feuille.nbPers_);
 		for(int no=0 ; no < chemin.size() ; no++) {

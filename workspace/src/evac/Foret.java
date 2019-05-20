@@ -68,6 +68,28 @@ public class Foret {
 		cheminsEvac.add(chemin);
 	}
 	
+	//pour récupérer le chemin d'évac d'une feuille avec son id
+	Chemin recupChemin(Integer idFeuille) {
+		for (int i=0 ; i < cheminsEvac.size() ; i++) {
+			if (cheminsEvac.get(i).getFeuille().getId()==idFeuille) {
+				cheminsEvac.get(i).printChemin();
+				return cheminsEvac.get(i);
+			} 
+		}
+		System.out.println("FEUILLE INEXISTANTE");
+		return null;
+	}
+	
+	Arc recupArc(int id1, int id2) {
+		for(int no=0 ; no < arcs.size() ; no++) {
+			if ((arcs.get(no).getS1().getId()==id1)&&(arcs.get(no).getS2().getId()==id2)) {
+				return arcs.get(no);
+			}
+		}
+		System.out.println("ARC INEXISTANT");
+		return null;
+	}
+	
 	
 public void printForet() {
 	System.out.println("***FORET***");

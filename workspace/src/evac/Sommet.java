@@ -23,4 +23,7 @@ public class Sommet {
 		maxPack_=maxPack;
 	}
 	
+	public int getId() {return id_;}
+	public int getPop() {return nbPers_;}
+	
 }
