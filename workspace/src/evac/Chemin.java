@@ -22,6 +22,11 @@ public class Chemin {
 	
 	Sommet getNoeudAt(int index) {return chemin.get(index);}
 	
+	//retourne le sommet qui suit le sommet en argument
+	Sommet getNoeudSuivant(Sommet sommet) {
+		return chemin.get(chemin.indexOf(sommet)+1);
+	}
+	
 	public void printChemin() {
 		System.out.println("Feuille : "+feuille.id_+" ; max pack : "+feuille.maxPack_+" ; nb personnes : "+feuille.nbPers_);
 		for(int no=0 ; no < chemin.size() ; no++) {

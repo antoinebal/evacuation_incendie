@@ -30,19 +30,39 @@ public class Checker {
 	*/
 	
 	public class Noeud {
-	int id;
-	TreeMap<Integer, Integer> avl;
+	private Sommet sommet;
+	private TreeMap<Integer, Integer> avl;
+	Chemin cheminEvac;
 	
-	Noeud(int id) {
-		this.id=id;
+	Noeud(Sommet sommet, Chemin ce) {
+		this.sommet=sommet;
 		avl = new TreeMap<Integer, Integer>();
+		cheminEvac=ce;
 	}
 	
 	void addEvent(int date, int flux) {
-		avl.put(date, flux);
+		if (avl.containsKey(date)) {
+			/*
+			 * si un event déjà associé à cette date est dans l'avl, 
+			 * on ajoute aux flux actuel qui y est associé le flux du nouvel
+			 * event généré
+			 */
+			int fluxActuel = avl.get(date);
+			avl.put(date, fluxActuel+flux);
+		} else {
+			/*
+			 * si aucun event n'a été crée pour cette date on le crée avec
+			 * le flux spécifié
+			 */
+			avl.put(date, flux);
+		}
+		
 	}
-	int getID() {return id;}
+	Sommet getSommet() {return sommet;}
 	TreeMap<Integer, Integer> getAVL() {return avl;}
+	Chemin getChemin() {return cheminEvac;}
+	
+	
 	}
 	
 	
@@ -126,7 +146,7 @@ public class Checker {
 					int cptPopulation=feuille.getPop();
 					
 					//on crée le noeud de l'autre côté du chemin
-					Noeud noeud = new Noeud(sommetSuivant.getId());
+					Noeud noeud = new Noeud(sommetSuivant, cheminEvac);
 					noeuds.add(noeud);
 					
 					//variable à être incrémentée
@@ -143,6 +163,9 @@ public class Checker {
 					 */				
 					if (cptPopulation != 0) {
 						noeud.addEvent(temps, cptPopulation);
+						
+						//on met cptPop à 0 pour modéliser que tout le monde est sorti
+						cptPopulation=0;
 					}
 					
 					
@@ -152,8 +175,82 @@ public class Checker {
 			boolean over=false;
 			//on vient de parcourir les feuilles
 			while (ok&&!over) {
+				int dateMin=Integer.MAX_VALUE;
+				
+				//on cherche la date minimale dans les events
+				for (int i=0 ; i < noeuds.size() ; i++) {
+					Noeud noeudCourant = noeuds.get(i);
+					TreeMap<Integer, Integer> avlNC = noeudCourant.getAVL();
+					if (!(avlNC.isEmpty())) {
+						int date = avlNC.firstKey();
+						if (date < dateMin) {
+							dateMin=date;
+						}
+					}
+				}
+				
 				for (int i=0 ; i < noeuds.size() ; i++) {
 					
+					Noeud noeudCourant = noeuds.get(i);
+					TreeMap<Integer, Integer> avlNC = noeudCourant.getAVL();
+					
+					/*
+					 * le nombre de personnes partant depuis ce noeud
+					 * au temps courant
+					 */
+					if (avlNC.isEmpty()) {
+						over=true;
+					} else {
+						over=false;
+						int date = avlNC.firstKey();
+						int flux = avlNC.remove(date);
+						
+						//ce noeud contient des events de la date minimale : on les traite
+						if (date==dateMin) {
+					
+							//on récupère l'arc qui le lie au noeud suivant
+							Sommet sommetSuivant = noeudCourant.getChemin().getNoeudSuivant(noeudCourant.getSommet());
+							Arc arc = foret.recupArc(noeudCourant.getSommet().getId(), sommetSuivant.getId());
+							
+							//on vérifie si les events respectent bien les règles de l'arc
+							if (arc.capacite < flux) {
+								ok=false;
+								System.out.print("Capa dépassée entre "+noeudCourant.getSommet().getId()+" et "+sommetSuivant.getId());
+							}
+							
+							if (arc.dateExp < date) {
+								ok=false;
+								System.out.print("Arc expiré entre "+noeudCourant.getSommet().getId()+" et "+sommetSuivant.getId());
+							}
+							
+							//on crée le noeud associé au noeud suivant s'il n'existe pas
+							boolean found=false;
+							int no = 0;
+							while ((!found)&&(no < noeuds.size())) {
+								if (noeuds.get(no).getSommet().getId()==sommetSuivant.getId()) {
+									found=true;
+									
+								} else {
+									no++;
+								}
+							}
+							
+							if (found) {
+								//si le noeud est déjà existant on y ajoute l'event avec date courante + la durée de l'arc
+								noeuds.get(no).addEvent(date+arc.duree, flux);
+							} else {
+								//sinon on le crée et on lui ajoute l'event avec date courant + la durée de l'arc
+								Noeud noeud = new Noeud(sommetSuivant, noeudCourant.getChemin());
+								noeuds.add(noeud);
+								noeud.addEvent(date+arc.duree, flux);
+							}
+							
+						
+						
+						}
+					
+					
+					}
 				}
 			}
 			
@@ -164,6 +261,32 @@ public class Checker {
 		return ok;
 		
 	} 
+	
+	
+	 public static void main(String[] args) {
+		 TreeMap<Integer, Integer> avl = new TreeMap<Integer, Integer>();
+		 avl.put(1, 3);
+		 avl.put(1, 4);
+		 avl.put(1, 5);
+		 avl.put(1, 6);
+		 
+		 /*
+		 int tempsMin = avl.firstKey();
+			while (avl.firstKey()==tempsMin) {
+				System.out.println("tm : "+avl.remove(avl.firstKey()));
+			}
+			
+			*/
+		 
+		 int fk = avl.firstKey();
+		 System.out.println("fk : "+fk);
+		 System.out.println("value : "+avl.remove(fk));
+		 
+		 fk = avl.firstKey();
+		 System.out.println("fk : "+fk);
+		 System.out.println("value : "+avl.remove(fk));
+		 
+		}
 		
 }	
 	 
