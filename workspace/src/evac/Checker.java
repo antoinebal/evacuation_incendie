@@ -6,6 +6,7 @@ import java.lang.Comparable;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.NoSuchElementException;
 import java.util.TreeMap;
 
 public class Checker {
@@ -25,7 +26,11 @@ public class Checker {
 			temps = temps + duree;
 		}
 		
-		 
+		 .sommet=sommet;.sommet=sommet;
+		avl = new TreeMap<Integer, Integer>();
+		chem
+		avl = new TreeMap<Integer, Integer>();
+		chem
 	}
 	*/
 	
@@ -65,13 +70,31 @@ public class Checker {
 	
 	}
 	
+	public int noeudExiste(Sommet sommet) {
+		boolean found=false;
+		int no = 0;
+		while ((!found)&&(no < noeuds.size())) {
+			if (noeuds.get(no).getSommet().getId()==sommet.getId()) {
+				found=true;
+				
+			} else {
+				no++;
+			}
+		}
+		if (found) {
+			return no;
+		} else {
+			return -1;
+		}
+	}
+	
 	
 	public Checker (String fileName){
 		    try {
 		    	//on construit la forêt et la solution
 		    	FileAgent fa = new FileAgent(fileName);
 				solution = fa.processLineByLineSolution();
-				FileAgent fa2 = new FileAgent("../InstancesInt/"+solution.nomInstance);
+				FileAgent fa2 = new FileAgent("../InstancesInt/"+solution.nomInstance+".txt");
 				foret=fa2.processLineByLineForest();
 			} catch (IOException e) {
 				e.printStackTrace();
@@ -112,6 +135,7 @@ public class Checker {
 			
 			//on parcourt toutes les feuilles de la solution et
 			//on crée tous les évènements
+			try {
 			for (int i=0 ; i<solution.nbFeuilleEvac ; i++) { 
 				
 				int txEvacSol = solution.feuilles.get(i).tauxEvac ; 
@@ -126,6 +150,9 @@ public class Checker {
 				
 				//on récup l'arc entre la feuille et le premier sommet du chemin d'évac
 				Sommet sommetSuivant = cheminEvac.getNoeudAt(0);
+				
+				
+				
 				Arc arc = foret.recupArc(idFeuille, sommetSuivant.getId());
 				
 				//on vérifie bien que le taux < capa arc
@@ -135,7 +162,7 @@ public class Checker {
 				}
 				
 				//on vérifie bien que le duedate > dateDebut
-				else if (txEvacSol > arc.getDateExp()) {
+				else if (debut > arc.getDateExp()) {
 					ok=false;
 					System.out.println("mauvaise date de début de la feuille "+idFeuille+" dans la solution");
 				}
@@ -145,7 +172,7 @@ public class Checker {
 					//compteur qui va être décrémenté à mesure que les events sont crées 
 					int cptPopulation=feuille.getPop();
 					
-					//on crée le noeud de l'autre côté du chemin
+					//on crée le noeud de l'autre côté de l'arc
 					Noeud noeud = new Noeud(sommetSuivant, cheminEvac);
 					noeuds.add(noeud);
 					
@@ -168,13 +195,16 @@ public class Checker {
 						cptPopulation=0;
 					}
 					
+				
+					
 					
 				} 
 			} 
 			
-			boolean over=false;
 			//on vient de parcourir les feuilles
-			while (ok&&!over) {
+			int compteurAVLVides=0;
+			while (ok&&(compteurAVLVides!=noeuds.size())) {
+				compteurAVLVides=0;
 				int dateMin=Integer.MAX_VALUE;
 				
 				//on cherche la date minimale dans les events
@@ -199,15 +229,14 @@ public class Checker {
 					 * au temps courant
 					 */
 					if (avlNC.isEmpty()) {
-						over=true;
+						compteurAVLVides++;
 					} else {
-						over=false;
 						int date = avlNC.firstKey();
-						int flux = avlNC.remove(date);
+						
 						
 						//ce noeud contient des events de la date minimale : on les traite
 						if (date==dateMin) {
-					
+							int flux = avlNC.remove(date);
 							//on récupère l'arc qui le lie au noeud suivant
 							Sommet sommetSuivant = noeudCourant.getChemin().getNoeudSuivant(noeudCourant.getSommet());
 							Arc arc = foret.recupArc(noeudCourant.getSommet().getId(), sommetSuivant.getId());
@@ -224,20 +253,11 @@ public class Checker {
 							}
 							
 							//on crée le noeud associé au noeud suivant s'il n'existe pas
-							boolean found=false;
-							int no = 0;
-							while ((!found)&&(no < noeuds.size())) {
-								if (noeuds.get(no).getSommet().getId()==sommetSuivant.getId()) {
-									found=true;
-									
-								} else {
-									no++;
-								}
-							}
 							
-							if (found) {
+							int index=noeudExiste(sommetSuivant);
+							if (index!=-1) {
 								//si le noeud est déjà existant on y ajoute l'event avec date courante + la durée de l'arc
-								noeuds.get(no).addEvent(date+arc.duree, flux);
+								noeuds.get(index).addEvent(date+arc.duree, flux);
 							} else {
 								//sinon on le crée et on lui ajoute l'event avec date courant + la durée de l'arc
 								Noeud noeud = new Noeud(sommetSuivant, noeudCourant.getChemin());
@@ -253,9 +273,10 @@ public class Checker {
 					}
 				}
 			}
-			
-			
-			
+				
+			} catch (NoSuchElementException e) {
+				e.printStackTrace();
+			}
 		
 		}
 		return ok;
@@ -264,27 +285,9 @@ public class Checker {
 	
 	
 	 public static void main(String[] args) {
-		 TreeMap<Integer, Integer> avl = new TreeMap<Integer, Integer>();
-		 avl.put(1, 3);
-		 avl.put(1, 4);
-		 avl.put(1, 5);
-		 avl.put(1, 6);
-		 
-		 /*
-		 int tempsMin = avl.firstKey();
-			while (avl.firstKey()==tempsMin) {
-				System.out.println("tm : "+avl.remove(avl.firstKey()));
-			}
-			
-			*/
-		 
-		 int fk = avl.firstKey();
-		 System.out.println("fk : "+fk);
-		 System.out.println("value : "+avl.remove(fk));
-		 
-		 fk = avl.firstKey();
-		 System.out.println("fk : "+fk);
-		 System.out.println("value : "+avl.remove(fk));
+
+		 Checker checker = new Checker("../Solution/graphe-TD-sans-DL-sol.txt");
+		 checker.checkSolution();
 		 
 		}
 		

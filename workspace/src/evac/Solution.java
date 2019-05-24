@@ -38,6 +38,8 @@ public class Solution {
 		feuilles=new ArrayList<FeuilleEvac>();
 	}
 	
+	Solution(String nomInstance, int nbFeuilleEvac, String valid) {}
+	
 	void setNomInstance (String nomInstance) { 
 		this.nomInstance=nomInstance ; 
 	}

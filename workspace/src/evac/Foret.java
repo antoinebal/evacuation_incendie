@@ -1,5 +1,7 @@
 package evac;
+import java.io.IOException;
 import java.util.ArrayList;
+import java.util.NoSuchElementException;
 
 public class Foret {
 	
@@ -80,14 +82,15 @@ public class Foret {
 		return null;
 	}
 	
-	Arc recupArc(int id1, int id2) {
+	Arc recupArc(int id1, int id2) throws NoSuchElementException{
 		for(int no=0 ; no < arcs.size() ; no++) {
 			if ((arcs.get(no).getS1().getId()==id1)&&(arcs.get(no).getS2().getId()==id2)) {
 				return arcs.get(no);
 			}
 		}
-		System.out.println("ARC INEXISTANT");
-		return null;
+		throw new NoSuchElementException();
+		
+		
 	}
 	
 	
@@ -112,5 +115,18 @@ public void printForet() {
 	}
 	
 }
+
+
+public static void main(String[] args) {
+	try {
+    	//on construit la forêt et la solution
+    	FileAgent fa = new FileAgent("../InstancesInt/graphe-TD-sans-DL-data.txt");
+		Foret foret=fa.processLineByLineForest();
+		
+		System.out.println(foret.recupArc(0, 1));
+	} catch (IOException e) {
+		e.printStackTrace();
+	}
+	}
 	
 }

@@ -35,6 +35,7 @@ public class FileAgent {
 
 		protected void processLineForest(String line) throws IOException{
 		    //use a second Scanner to parse the content of each line 
+			if (!line.isEmpty()) {
 			if (line.charAt(0)!='c') {
 		    try(Scanner scanner = new Scanner(line)){
 		      scanner.useDelimiter(" ");
@@ -110,6 +111,7 @@ public class FileAgent {
 		    
 			} else {
 				state++ ; 
+			}
 			}
 		}
 		
@@ -188,7 +190,7 @@ public class FileAgent {
 
 		
 	 public static void main(String[] args) {
-			FileAgent fa = new FileAgent("../InstancesInt/sparse_10_30_3_5_I.full");
+			FileAgent fa = new FileAgent("../InstancesInt/dense_10_30_3_2_I.full");
 			try {
 				fa.processLineByLineForest();
 				fa.printForet();
