@@ -87,6 +87,7 @@ public class RLIntensification {
 	}
 	
 	void intensificationValid() {
+		genereVoisinage () ; 
 		
 	}
 	

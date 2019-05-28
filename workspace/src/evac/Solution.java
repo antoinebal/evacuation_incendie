@@ -1,5 +1,9 @@
 package evac;
 
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.PrintWriter;
+import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 
 
@@ -10,17 +14,7 @@ public class Solution {
 	
 	int nbFeuilleEvac ; 
 	
-	public class FeuilleEvac { 
-		int id ; 
-		int tauxEvac ; 
-		int dateDebut ; 
-		
-		 FeuilleEvac(int id, int tauxEvac, int dateDebut) { 
-			this.id=id ; 
-			this.tauxEvac=tauxEvac ; 
-			this.dateDebut=dateDebut; 
-		}
-		}
+// FEUILLE EVAC CLASSE APPART POUR POUVOIR CREER DES OBJETS ! 
 	
 	ArrayList<FeuilleEvac> feuilles ; 
 		
@@ -91,6 +85,54 @@ public class Solution {
 		feuilles.get(i).dateDebut-=delta;
 	}
 	
+	void getInFile () { 
+		
+		PrintWriter writer;
+		try {
+			// a voir ici : le path pour le fichier a créer et son nom , 
+			//si nom instance s'utilise avec ou sans this
+			// et s'il contient le .txt/full ou pas , apparement non 
+			
+			writer = new PrintWriter("../Solution/"+nomInstance+"_sol.full", "UTF-8");
+		
+			writer.println(nomInstance);
+			writer.println(nbFeuilleEvac);
+			
+			for (int i=0 ; i<nbFeuilleEvac ; i++) {
+				writer.println(feuilles.get(i).id+" "+feuilles.get(i).tauxEvac+" "+feuilles.get(i).dateDebut);
+			}
+			writer.println(valid);
+			writer.println(fctObjectif);
+			writer.println(tpsCalcul);
+			writer.println(methode);
+			writer.println(comment);
+			writer.close();
+			
+		} catch (FileNotFoundException | UnsupportedEncodingException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
+	
+	
+	
+/*	GET IN FILE TEST 
+	
+	 public static void main(String[] args) {
+		 
+		 FileAgent fa = new FileAgent("../Solution/graphe-TD-sans-DL-sol.txt");
+			try {
+				Solution solution = fa.processLineByLineSolution();
+				
+				solution.getInFile(); 
+				
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		 
+	 }
+	*/
 	
 }
 	
