@@ -99,7 +99,32 @@ public class Checker {
 			} catch (IOException e) {
 				e.printStackTrace();
 			}
-	 	  }
+	}
+	
+	public Checker(Solution solution) {
+		this.solution=solution;
+		FileAgent fa2 = new FileAgent("../InstancesInt/"+solution.nomInstance+".txt");
+		try {
+			foret=fa2.processLineByLineForest();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
+	
+	
+	public void setSolution(Solution solution) {
+		this.solution=solution;
+		FileAgent fa2 = new FileAgent("../InstancesInt/"+solution.nomInstance+".txt");
+		try {
+			foret=fa2.processLineByLineForest();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+		noeuds.clear();
+	}
 	
 	public boolean checkSolution() {
 		

@@ -40,6 +40,17 @@ public class Solution {
 	
 	Solution(String nomInstance, int nbFeuilleEvac, String valid) {}
 	
+	Solution(Solution copy){
+		this.nomInstance = copy.nomInstance ; 
+		this.nbFeuilleEvac = copy.nbFeuilleEvac ; 
+		this.feuilles = new ArrayList<FeuilleEvac>(copy.feuilles) ; 
+		this.valid = copy.valid ; 
+		this.fctObjectif = copy.fctObjectif ; 
+		this.tpsCalcul = copy.tpsCalcul ; 
+		this.methode = copy.methode ; 
+		this.comment = copy.comment ; 
+	}
+	
 	void setNomInstance (String nomInstance) { 
 		this.nomInstance=nomInstance ; 
 	}
@@ -70,6 +81,14 @@ public class Solution {
 	
 	void setComment (String comment) { 
 		this.comment=comment ; 
+	}
+	
+	void setRateFeuilleNo(int i, int delta) {
+		feuilles.get(i).tauxEvac+=delta;
+	}
+	
+	void setDateFeuilleNo(int i, int delta) {
+		feuilles.get(i).dateDebut-=delta;
 	}
 	
 	
