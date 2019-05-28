@@ -31,4 +31,12 @@ public class Arc {
 		System.out.println("Capacité : "+capacite);
 		
 	}
+	
+	public String toString() {
+		return "ID1 : "+s1.getId() + " ; ID2 : "+s2.getId();
+	}
+	
+	public static void main(String[] args) {
+		
+	}
 }

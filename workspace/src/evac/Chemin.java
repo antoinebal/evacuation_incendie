@@ -26,7 +26,13 @@ public class Chemin {
 	
 	//retourne le sommet qui suit le sommet en argument
 	Sommet getNoeudSuivant(Sommet sommet) {
-		return chemin.get(chemin.indexOf(sommet)+1);
+		int indexSommet = chemin.indexOf(sommet);
+		if (indexSommet == chemin.size()-1) {
+			//sommet est le noeud safe donc on retourne null
+			return null;
+		} else {
+			return chemin.get(indexSommet+1);
+		}
 	}
 	
 	/*

@@ -106,6 +106,7 @@ public class Checker {
 		
 		boolean ok = true ; 
 		//I : le nombre de feuilles est il correct?
+		int date=0;
 		if (solution.nbFeuilleEvac > foret.nbFeuille) { 
 			ok = false ;
 			System.out.println("Erreur : nombre de feuilles à évacuer plus grand que le nombre de feuilles de la forêt!"); 
@@ -149,11 +150,17 @@ public class Checker {
 				Sommet feuille = cheminEvac.feuille;
 				
 				//on récup l'arc entre la feuille et le premier sommet du chemin d'évac
-				Sommet sommetSuivant = cheminEvac.getNoeudAt(0);
+				Sommet sommetSuivant = cheminEvac.getNoeudAt(1);
 				
+				cheminEvac.printChemin();
 				
-				
-				Arc arc = foret.recupArc(idFeuille, sommetSuivant.getId());
+				Arc arc=null;
+				try {
+					arc = foret.recupArc(idFeuille, sommetSuivant.getId());
+				} catch (NoSuchElementException e) {
+					e.printStackTrace();
+					System.out.println("PB en cherchant l'arc entre "+idFeuille+" et "+sommetSuivant.getId());
+				}
 				
 				//on vérifie bien que le taux < capa arc
 				if (txEvacSol > arc.getCapa()) {
@@ -177,11 +184,13 @@ public class Checker {
 					noeuds.add(noeud);
 					
 					//variable à être incrémentée
-					int temps = debut;
+					int temps = debut+arc.duree;
 					while (cptPopulation > txEvacSol) {
 						noeud.addEvent(temps, txEvacSol);
 						cptPopulation = cptPopulation - txEvacSol;
+						System.out.println("Event ["+temps+" , "+txEvacSol+"] généré pour noeud "+noeud.getSommet().getId());
 						temps = temps + 1;
+						
 					}
 					
 					/*
@@ -190,6 +199,7 @@ public class Checker {
 					 */				
 					if (cptPopulation != 0) {
 						noeud.addEvent(temps, cptPopulation);
+						System.out.println("Event ["+temps+" , "+cptPopulation+"] généré pour noeud "+noeud.getSommet().getId());
 						
 						//on met cptPop à 0 pour modéliser que tout le monde est sorti
 						cptPopulation=0;
@@ -212,7 +222,7 @@ public class Checker {
 					Noeud noeudCourant = noeuds.get(i);
 					TreeMap<Integer, Integer> avlNC = noeudCourant.getAVL();
 					if (!(avlNC.isEmpty())) {
-						int date = avlNC.firstKey();
+						date = avlNC.firstKey();
 						if (date < dateMin) {
 							dateMin=date;
 						}
@@ -231,47 +241,60 @@ public class Checker {
 					if (avlNC.isEmpty()) {
 						compteurAVLVides++;
 					} else {
-						int date = avlNC.firstKey();
+						date = avlNC.firstKey();
 						
 						
 						//ce noeud contient des events de la date minimale : on les traite
 						if (date==dateMin) {
+							System.out.println("Date : "+dateMin);
 							int flux = avlNC.remove(date);
 							//on récupère l'arc qui le lie au noeud suivant
 							Sommet sommetSuivant = noeudCourant.getChemin().getNoeudSuivant(noeudCourant.getSommet());
-							Arc arc = foret.recupArc(noeudCourant.getSommet().getId(), sommetSuivant.getId());
-							
-							//on vérifie si les events respectent bien les règles de l'arc
-							if (arc.capacite < flux) {
-								ok=false;
-								System.out.print("Capa dépassée entre "+noeudCourant.getSommet().getId()+" et "+sommetSuivant.getId());
-							}
-							
-							if (arc.dateExp < date) {
-								ok=false;
-								System.out.print("Arc expiré entre "+noeudCourant.getSommet().getId()+" et "+sommetSuivant.getId());
-							}
-							
-							//on crée le noeud associé au noeud suivant s'il n'existe pas
-							
-							int index=noeudExiste(sommetSuivant);
-							if (index!=-1) {
-								//si le noeud est déjà existant on y ajoute l'event avec date courante + la durée de l'arc
-								noeuds.get(index).addEvent(date+arc.duree, flux);
+							if (sommetSuivant != null) {
+								Arc arc=null;
+								try {
+									arc = foret.recupArc(noeudCourant.getSommet().getId(), sommetSuivant.getId());
+								} catch (NoSuchElementException e) {
+									e.printStackTrace();
+									System.out.println("PB en cherchant les arcs des inter");
+								}
+								
+								//on vérifie si les events respectent bien les règles de l'arc
+								if (arc.capacite < flux) {
+									ok=false;
+									System.out.println("Capa dépassée ("+flux+") entre "+noeudCourant.getSommet().getId()+" et "+sommetSuivant.getId());
+								} else {
+									System.out.println("Capa OK ("+flux+") entre "+noeudCourant.getSommet().getId()+" et "+sommetSuivant.getId());
+								}
+								
+								if (arc.dateExp < date) {
+									ok=false;
+									System.out.print("Arc expiré entre "+noeudCourant.getSommet().getId()+" et "+sommetSuivant.getId());
+								}
+								
+								//on crée le noeud associé au noeud suivant s'il n'existe pas
+								
+								int index=noeudExiste(sommetSuivant);
+								if (index!=-1) {
+									//si le noeud est déjà existant on y ajoute l'event avec date courante + la durée de l'arc
+									noeuds.get(index).addEvent(date+arc.duree, flux);
+								} else {
+									//sinon on le crée et on lui ajoute l'event avec date courant + la durée de l'arc
+									Noeud noeud = new Noeud(sommetSuivant, noeudCourant.getChemin());
+									noeuds.add(noeud);
+									noeud.addEvent(date+arc.duree, flux);
+								}
 							} else {
-								//sinon on le crée et on lui ajoute l'event avec date courant + la durée de l'arc
-								Noeud noeud = new Noeud(sommetSuivant, noeudCourant.getChemin());
-								noeuds.add(noeud);
-								noeud.addEvent(date+arc.duree, flux);
+								System.out.println("On est au noeud safe");
 							}
-							
-						
-						
-						}
-					
-					
+						}				
 					}
 				}
+			}
+			
+			if (ok) {
+				date++;
+				System.out.println("END DATE = "+date);
 			}
 				
 			} catch (NoSuchElementException e) {
@@ -288,6 +311,9 @@ public class Checker {
 
 		 Checker checker = new Checker("../Solution/graphe-TD-sans-DL-sol.txt");
 		 checker.checkSolution();
+		/* Path currentRelativePath = Paths.get("");
+		 String s = currentRelativePath.toAbsolutePath().toString();
+		 System.out.println("Current relative path is: " + s);*/
 		 
 		}
 		

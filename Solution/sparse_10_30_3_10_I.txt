@@ -1,0 +1,9 @@
+---
+all_constraints: []
+no_deadline_constraint: []
+no_load_constraint:
+  - end_date: 173
+    solution: web/solutions/18037658715852280997
+  - end_date: 178
+    solution: web/solutions/9208431686788131447
+invalids: []
