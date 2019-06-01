@@ -23,10 +23,10 @@ public class BorneCalc {
 		Sommet feuille ; 
 		ArrayList<Chemin> listChemin = foret.cheminsEvac ; 
 		int cpt,duree ;
-		int longTrain=0,max=0 ; 
+		int max=0 ; 
 		
 		for (int i =0 ; i<listChemin.size() ; i++) { 
-			
+			int longTrain=0;
 			chem = listChemin.get(i) ;
 			feuille = chem.getFeuille() ; 
 			
@@ -56,15 +56,19 @@ public class BorneCalc {
 	
 	
 	
-	int borneSup () { 
+	ArrayList<Integer> borneSup () { 
 		int total = 0 ; 
+		ArrayList<Integer> datesDebut = new ArrayList<Integer> () ; 
 		Chemin chem ;
 		Sommet feuille ; 
 		ArrayList<Chemin> listChemin = foret.cheminsEvac ; 
 		int cpt,duree ;
-		int longTrain=0 ; 
+		
+		
+		datesDebut.add(0) ;
 		
 		for (int i =0 ; i<listChemin.size() ; i++) { 
+			int longTrain=0 ; 
 			
 			chem = listChemin.get(i) ;
 			feuille = chem.getFeuille() ; 
@@ -82,44 +86,58 @@ public class BorneCalc {
 			
 			duree= chem.dureeChemin(foret) + longTrain; // duree chemin ne prend pas en compte la date debut
 			total=total+duree ; 
+			datesDebut.add(total); 
+			
 			}
-		return total ; 
+		return datesDebut ; 
 	}
 	
 	// int borne : 0 pour la borne inf, sinon c'est la sup  
 	Solution borneSolution (String nomInstance, int borne) { 
 		Solution s = new Solution () ; 
 		Sommet feuille ;  
-		
+		ArrayList<Integer> res  ; 
 		
 		s.nomInstance = nomInstance ; 
 		s.nbFeuilleEvac = foret.nbFeuille ;
-		
-		for (int i=0 ; i<s.nbFeuilleEvac ; i++) { 
-			feuille = foret.cheminsEvac.get(i).getFeuille() ; 
-			// ajout d'une feuille a evacuer avec son id, maxpack qui sera son taux d'evacuation effectif, 
-			//et 0 sa date de début effective 
-			FeuilleEvac fe = new FeuilleEvac (feuille.id_ ,feuille.maxPack_,0) ; 
-			s.feuilles.add(fe) ;
-			
-		} 
-		
-		s.valid = "valid" ;
-		
+	
+		int i ; 
 		if (borne==0) { 
 		// borne inf
 			Instant start = Instant.now();
 			s.fctObjectif=borneInf() ; 
 			Instant end = Instant.now();
 			s.tpsCalcul = (int) Duration.between(start, end).toMillis();
+			
+			for ( i=0 ; i<s.nbFeuilleEvac ; i++) { 
+				feuille = foret.cheminsEvac.get(i).getFeuille() ; 
+				// ajout d'une feuille a evacuer avec son id, maxpack qui sera son taux d'evacuation effectif, 
+				//et 0 sa date de début effective 
+				FeuilleEvac fe = new FeuilleEvac (feuille.id_ ,feuille.maxPack_,0) ; 
+				s.feuilles.add(fe) ;
+				
+			} 
+			s.valid = "valid" ;
 			s.methode = "execution basique du calcul de borne inférieure " ; 
 			s.comment = "BORNE INFERIEURE" ; 
 		} else { 
 			// borne sup 
+			
 			Instant start = Instant.now();
-			s.fctObjectif=borneInf() ; 
+			res = borneSup() ; 
 			Instant end = Instant.now();
 			s.tpsCalcul = (int) Duration.between(start, end).toMillis();
+			
+			for ( i=0 ; i<s.nbFeuilleEvac ; i++) { 
+				feuille = foret.cheminsEvac.get(i).getFeuille() ; 
+				// ajout d'une feuille a evacuer avec son id, maxpack qui sera son taux d'evacuation effectif, 
+				//et 0 sa date de début effective 
+				FeuilleEvac fe = new FeuilleEvac (feuille.id_ ,feuille.maxPack_,res.get(i)) ; 
+				s.feuilles.add(fe) ;
+				
+			} 
+			s.fctObjectif = res.get(i) ; 
+			s.valid = "valid" ;
 			s.methode = "execution basique du calcul de borne supérieure " ; 
 			s.comment = "BORNE SUPERIEURE" ; 
 			
@@ -133,16 +151,17 @@ public class BorneCalc {
 		
 		
 		try {
-			FileAgent fa = new FileAgent("../InstancesInt/dense_10_30_3_10_I.full");
+			FileAgent fa = new FileAgent("../InstancesInt/graphe-TD-sans-DL-data.txt");
 			Foret foret=fa.processLineByLineForest();
 			BorneCalc testBorneInf = new BorneCalc (foret) ;
 			BorneCalc testBorneSup = new BorneCalc (foret) ;
 			
-			testBorneInf.borneSolution("dense_10_30_3_10_I",0) ; 
-			testBorneSup.borneSolution("dense_10_30_3_10_I",1) ; 
-			
+			testBorneInf.borneSolution("test_inf",0).getInFile(); 
+			testBorneSup.borneSolution("test_sup",1).getInFile(); 
+		
 			
 			System.out.println(testBorneInf.borneInf());
+			
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();

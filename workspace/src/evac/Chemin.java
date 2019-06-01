@@ -40,10 +40,11 @@ public class Chemin {
 	 * on la parcourait sans s'arrêter
 	 */
 	public int dureeChemin(Foret foret) {
-		int duree=foret.recupArc(feuille.getId(), chemin.get(0).getId()).getDuree();
+		int duree=0;
 		for (int i = 0 ; i < chemin.size()-1 ; i++) {
 			duree=duree+foret.recupArc(chemin.get(i).getId(), chemin.get(i+1).getId()).getDuree();
 		}
+		//System.out.println(duree);
 		return duree;
 	}
 	

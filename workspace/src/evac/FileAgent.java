@@ -174,12 +174,23 @@ public class FileAgent {
 			 }
 			 
 			 else if (state==5) {
-				 solution.setMethode(scanner.next());
+				 String methode = "";
+				 methode = scanner.next();
+				 while (scanner.hasNext()) {
+					 methode = methode +" "+ scanner.next();
+				 }
+				 solution.setMethode(methode);
 				 state++;
 			 }
 			 
 			 else if (state==6) {
-				 solution.setComment(scanner.next());
+				 
+				 String comment = "";
+				 comment = scanner.next();
+				 while (scanner.hasNext()) {
+					 comment = comment +" "+ scanner.next();
+				 }
+				 solution.setComment(comment);
 				 state++;
 			 }
 			 

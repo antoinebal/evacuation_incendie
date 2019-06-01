@@ -116,11 +116,11 @@ public class Solution {
 	
 	
 	
-/*	GET IN FILE TEST 
+//	GET IN FILE TEST 
 	
 	 public static void main(String[] args) {
 		 
-		 FileAgent fa = new FileAgent("../Solution/graphe-TD-sans-DL-sol.txt");
+		 FileAgent fa = new FileAgent("Solution/graphe-TD-sans-DL-sol.txt");
 			try {
 				Solution solution = fa.processLineByLineSolution();
 				
@@ -132,7 +132,7 @@ public class Solution {
 			}
 		 
 	 }
-	*/
+	
 	
 }
 	
