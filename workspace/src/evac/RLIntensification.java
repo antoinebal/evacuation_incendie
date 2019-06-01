@@ -52,38 +52,56 @@ public class RLIntensification {
 		}
 	}
 	
+	
+	/*
+	 * on a généré un voisinage composé que d'un seul
+	 * voisin car tous les autres étaient non valables
+	 */
 	public ArrayList<Solution> genereVoisinage() {
 		ArrayList<Solution> voisinage = new ArrayList<Solution>();
 		
 		for (int i = 0 ; i < solution.nbFeuilleEvac ; i++) {
-			voisinage.add(genereVoisinDate(i));
-			voisinage.add(genereVoisinRate(i));
+			Solution voisin1 = genereVoisinDate(i);
+			if (voisin1 != null) {
+				voisinage.add(voisin1);
+			}
+			Solution voisin2 = genereVoisinRate(i);
+			if (voisin2 != null) {
+				voisinage.add(voisin2);
+			}
 		}
-		
 		return voisinage;
 	}
 	
 	// Faire partir plus tot 
 	public Solution genereVoisinDate(int numeroFeuille) {
-		Solution newSolution = new Solution(solution) ;              
+		Solution newSolution = new Solution(solution) ; 
+		Solution aux = newSolution;
+		newSolution = this.solution;
+		this.solution = aux;
 	//	Sommet feuille = this.solution.feuilles.get(numeroFeuille) ; 
 		
 		if ((solution.feuilles.get(numeroFeuille).dateDebut - delta)>=0) {
 			newSolution.setDateFeuilleNo(numeroFeuille,delta);
+			return newSolution;
 		}
 		
-		return newSolution ; 
+		return null ; 
 	}
 	
 	public Solution genereVoisinRate(int numeroFeuille) {
-		Solution newSolution = new Solution(solution);
+		Solution newSolution = new Solution(solution) ; 
+		Solution aux = newSolution;
+		newSolution = this.solution;
+		this.solution = aux;
 		// Reduire nombre paquet 
 		// Taux evac solution + delta <= maxPack de la feuille
 		if ((solution.feuilles.get(numeroFeuille).tauxEvac + delta <=  foret.recupChemin(solution.feuilles.get(numeroFeuille).id).getNoeudAt(0).maxPack_)) { 
 			newSolution.setRateFeuilleNo(numeroFeuille, delta); 
+			return newSolution;
 		}
 		
-		return newSolution ; 
+		return null ; 
 	}
 	
 	void intensificationValid() {
@@ -99,8 +117,8 @@ public class RLIntensification {
 	 public static void main(String[] args) {
 		RLIntensification rli = new RLIntensification("../Solution/graphe-TD-sans-DL-sol.txt");
 		ArrayList<Solution> voisinage=rli.genereVoisinage();
-	
-
+		
+		
 		 
 		}
 	

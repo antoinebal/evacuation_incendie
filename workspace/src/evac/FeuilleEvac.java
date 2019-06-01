@@ -10,5 +10,11 @@ public class FeuilleEvac {
 			this.tauxEvac=tauxEvac ; 
 			this.dateDebut=dateDebut; 
 		}
+		 
+		 FeuilleEvac(FeuilleEvac object) {
+			this.id=object.id ; 
+			this.tauxEvac=object.tauxEvac ; 
+			this.dateDebut=object.dateDebut; 
+		 }
 }
 

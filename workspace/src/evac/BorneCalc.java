@@ -117,9 +117,15 @@ public class BorneCalc {
 				s.feuilles.add(fe) ;
 				
 			} 
-			s.valid = "valid" ;
 			s.methode = "execution basique du calcul de borne inférieure " ; 
 			s.comment = "BORNE INFERIEURE" ; 
+			s.valid = "invalid";
+			
+			//Attention vérifier si la borne inf est valide
+			//Checker checker = new Checker(s);
+			//if (checker.checkSolution()) {
+		//		s.valid = "valid";
+		//	} 
 		} else { 
 			// borne sup 
 			
@@ -156,7 +162,7 @@ public class BorneCalc {
 			BorneCalc testBorneInf = new BorneCalc (foret) ;
 			BorneCalc testBorneSup = new BorneCalc (foret) ;
 			
-			testBorneInf.borneSolution("test_inf",0).getInFile(); 
+			testBorneInf.borneSolution("graphe-TD-sans-DL-data",0).getInFile(); 
 			testBorneSup.borneSolution("test_sup",1).getInFile(); 
 		
 			

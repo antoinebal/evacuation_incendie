@@ -37,12 +37,19 @@ public class Solution {
 	Solution(Solution copy){
 		this.nomInstance = copy.nomInstance ; 
 		this.nbFeuilleEvac = copy.nbFeuilleEvac ; 
-		this.feuilles = new ArrayList<FeuilleEvac>(copy.feuilles) ; 
 		this.valid = copy.valid ; 
 		this.fctObjectif = copy.fctObjectif ; 
 		this.tpsCalcul = copy.tpsCalcul ; 
 		this.methode = copy.methode ; 
 		this.comment = copy.comment ; 
+		
+
+		//this.feuilles = new ArrayList<FeuilleEvac>(copy.feuilles) ; 
+		this.feuilles = new ArrayList<FeuilleEvac>();
+		for (int i = 0 ; i < copy.feuilles.size() ; i++) {
+			FeuilleEvac fe = new FeuilleEvac(copy.feuilles.get(i));
+			this.feuilles.add(fe);
+		}
 	}
 	
 	void setNomInstance (String nomInstance) { 
@@ -120,10 +127,11 @@ public class Solution {
 	
 	 public static void main(String[] args) {
 		 
-		 FileAgent fa = new FileAgent("Solution/graphe-TD-sans-DL-sol.txt");
+		 FileAgent fa = new FileAgent("../Solution/graphe-TD-sans-DL-sol.txt");
 			try {
 				Solution solution = fa.processLineByLineSolution();
-				
+				Solution solution2 = new Solution(solution);
+				solution.setDateFeuilleNo(0, 1);
 				solution.getInFile(); 
 				
 			} catch (IOException e) {
