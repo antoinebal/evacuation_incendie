@@ -9,8 +9,7 @@ public class RLIntensification {
 	Checker checker;
 	Foret foret;
 	
-	
-	int delta=1;
+
 	
 	RLIntensification(String fichierSolution) {
 		FileAgent fa = new FileAgent(fichierSolution);
@@ -77,14 +76,17 @@ public class RLIntensification {
 		ArrayList<Solution> voisinage = new ArrayList<Solution>();
 		
 		for (int i = 0 ; i < solution.nbFeuilleEvac ; i++) {
-			Solution voisin1 = genereVoisinDate(i);
+			
+			for (int delta = 1 ; delta < 2 ; delta++) {
+			Solution voisin1 = genereVoisinDate(i, delta);
 			if (voisin1 != null) {
 				voisinage.add(voisin1);
 				
 			} 
-			Solution voisin2 = genereVoisinRate(i);
+			Solution voisin2 = genereVoisinRate(i, delta);
 			if (voisin2 != null) {
 				voisinage.add(voisin2);	
+			}
 			}
 		}
 		return voisinage;
@@ -94,7 +96,7 @@ public class RLIntensification {
 	/*
 	 * si le delta produit une valeur négative, on retourne nul
 	 */
-	public Solution genereVoisinDate(int numeroFeuille) {
+	public Solution genereVoisinDate(int numeroFeuille, int delta) {
 		Solution newSolution = new Solution(solution) ; 
 		Solution aux = newSolution;
 		newSolution = this.solution;
@@ -112,7 +114,7 @@ public class RLIntensification {
 	/*
 	 * si le delta produit une valeur négative, on retourne nul
 	 */
-	public Solution genereVoisinRate(int numeroFeuille) {
+	public Solution genereVoisinRate(int numeroFeuille, int delta) {
 		Solution newSolution = new Solution(solution) ; 
 		Solution aux = newSolution;
 		newSolution = this.solution;
@@ -127,8 +129,35 @@ public class RLIntensification {
 	}
 	
 	void intensificationValid() {
-		genereVoisinage () ; 
-		
+		boolean over=false;
+		while (!over) {
+			ArrayList<Solution> voisins = genereVoisinage();
+			
+			int minFctObj = Integer.MAX_VALUE;
+			int indexMeilleurVoisin = -1;
+			for (int i = 0 ; i < voisins.size() ; i++) {
+				checker.setSolution(voisins.get(i));
+				boolean validite = checker.checkSolution();
+				if (validite) {
+					if (voisins.get(i).fctObjectif < minFctObj) {
+						//ce voisin valide est le meilleur
+						minFctObj = voisins.get(i).fctObjectif;
+						indexMeilleurVoisin = i;
+					}
+				}
+			}
+			
+			//si aucun voisin meilleur trouvé, on arrête
+			if (indexMeilleurVoisin == -1) {
+				System.out.println("kikou " );
+				over=true;
+			} else {
+			//sinon le meilleur voisin devient la nouvelle solution
+				System.out.println("LOL " );
+				this.solution = voisins.get(indexMeilleurVoisin);
+			}		
+		}
+		 
 	}
 	
 	void intensificationInvalid() {
@@ -139,30 +168,33 @@ public class RLIntensification {
 	 public static void main(String[] args) {
 
 		try {
-			FileAgent fa = new FileAgent("../InstancesInt/sparse_10_30_3_7_I.full");
+
+		 	System.out.println("Working Directory = " +
+			System.getProperty("user.dir"));
+		 	String nomInstance = "medium_10_30_3_5_I" ; 
+			FileAgent fa = new FileAgent("../InstancesInt/"+nomInstance+".full");
 			Foret foret=fa.processLineByLineForest();
 			
 			BorneCalc testBorneSup = new BorneCalc (foret) ;
 			
-			testBorneSup.borneSolution("sparse_10_30_3_7_I",1).getInFile();
+			testBorneSup.borneSolution(nomInstance,1).getInFile();
 			
 			
-		 	System.out.println("Working Directory = " +
-			System.getProperty("user.dir"));
+			Checker checkert = new Checker(testBorneSup.borneSolution(nomInstance,1)) ; 
+			boolean validite = checkert.checkSolution();
+		 	System.out.println(validite);
 		 	
-		 	
-			RLIntensification rli = new RLIntensification("../Solution/sparse_10_30_3_7_I_sol.full");
+		/*	RLIntensification rli = new RLIntensification("../Solution/"+nomInstance+"_sol.full");
 			ArrayList<Solution> voisinage=rli.genereVoisinage();
+			
+			rli.intensification();
+			
+			rli.solution.getInFile();*/
 			
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		 
-		
-		
-		
-		 
 		}
 	
 	

@@ -320,6 +320,9 @@ public class Checker {
 			if (ok) {
 				date++;
 				System.out.println("END DATE = "+date);
+				//on change la fonction objectif
+				solution.fctObjectif = date;
+				solution.comment = "tchazzzou" ; 
 			}
 				
 			} catch (NoSuchElementException e) {

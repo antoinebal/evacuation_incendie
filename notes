@@ -18,3 +18,10 @@ Commence à la date 0 :
 et voir comment se propage ! un evenemnt d'entree et un de sortie pour chaque sommet !!! (la sortie d'un sera la sortie d'un autre ) et chemin d'evenemnt pour chaque feuille 
 après on trie tout ces evenement en fonction du temps (premier valeur du tuple) et vérfiie qu'on dépasse jamais la capacité a un temps donné pour la somme du 2e valeur tuple présent a cette unité de tps 
 
+
+------------------------------------
+
+aatention pour le delta : 
+si on fait un for de 1 a 15 par exemple ,  peu être moins bon (ou pas aussi) 
+mais pour la descente mieux de rester sur le meme delta tout le temps ! 
+
