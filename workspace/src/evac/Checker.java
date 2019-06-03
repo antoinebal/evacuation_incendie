@@ -94,7 +94,7 @@ public class Checker {
 		    	//on construit la forêt et la solution
 		    	FileAgent fa = new FileAgent(fileName);
 				solution = fa.processLineByLineSolution();
-				FileAgent fa2 = new FileAgent("../InstancesInt/"+solution.nomInstance+".txt");
+				FileAgent fa2 = new FileAgent("../InstancesInt/"+solution.nomInstance+".full");
 				foret=fa2.processLineByLineForest();
 			} catch (IOException e) {
 				e.printStackTrace();
@@ -103,7 +103,7 @@ public class Checker {
 	
 	public Checker(Solution solution) {
 		this.solution=solution;
-		FileAgent fa2 = new FileAgent("../InstancesInt/"+solution.nomInstance+".txt");
+		FileAgent fa2 = new FileAgent("../InstancesInt/"+solution.nomInstance+".full");
 		try {
 			foret=fa2.processLineByLineForest();
 		} catch (IOException e) {
@@ -115,7 +115,7 @@ public class Checker {
 	
 	public void setSolution(Solution solution) {
 		this.solution=solution;
-		FileAgent fa2 = new FileAgent("../InstancesInt/"+solution.nomInstance+".txt");
+		FileAgent fa2 = new FileAgent("../InstancesInt/"+solution.nomInstance+".full");
 		try {
 			foret=fa2.processLineByLineForest();
 		} catch (IOException e) {

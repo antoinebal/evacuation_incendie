@@ -21,7 +21,7 @@ public class RLIntensification {
 			e.printStackTrace();
 		}
 		this.checker = new Checker(solution);
-		FileAgent fa2 = new FileAgent("../InstancesInt/"+solution.nomInstance+".txt");
+		FileAgent fa2 = new FileAgent("../InstancesInt/"+solution.nomInstance+".full");
 		try {
 			foret = fa2.processLineByLineForest();
 		} catch (IOException e) {
@@ -29,10 +29,25 @@ public class RLIntensification {
 			e.printStackTrace();
 		}
 	}
-	RLIntensification(RLIntensification object)
-	{
-		
+	
+	RLIntensification(Solution solution) {
+		this.solution = solution;
+		this.checker = new Checker(solution);
+		FileAgent fa2 = new FileAgent("../InstancesInt/"+solution.nomInstance+".full");
+		try {
+			foret = fa2.processLineByLineForest();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 	}
+	
+	RLIntensification(Solution solution, Foret foret) {
+		this.solution = solution;
+		this.foret = foret;
+	}
+	
+	
 	
 	/*
 	 * on distingue deux types de solution : 
@@ -58,22 +73,27 @@ public class RLIntensification {
 	 * voisin car tous les autres étaient non valables
 	 */
 	public ArrayList<Solution> genereVoisinage() {
+		int echecVoisin=0;
 		ArrayList<Solution> voisinage = new ArrayList<Solution>();
 		
 		for (int i = 0 ; i < solution.nbFeuilleEvac ; i++) {
 			Solution voisin1 = genereVoisinDate(i);
 			if (voisin1 != null) {
 				voisinage.add(voisin1);
-			}
+				
+			} 
 			Solution voisin2 = genereVoisinRate(i);
 			if (voisin2 != null) {
-				voisinage.add(voisin2);
+				voisinage.add(voisin2);	
 			}
 		}
 		return voisinage;
 	}
 	
 	// Faire partir plus tot 
+	/*
+	 * si le delta produit une valeur négative, on retourne nul
+	 */
 	public Solution genereVoisinDate(int numeroFeuille) {
 		Solution newSolution = new Solution(solution) ; 
 		Solution aux = newSolution;
@@ -89,6 +109,9 @@ public class RLIntensification {
 		return null ; 
 	}
 	
+	/*
+	 * si le delta produit une valeur négative, on retourne nul
+	 */
 	public Solution genereVoisinRate(int numeroFeuille) {
 		Solution newSolution = new Solution(solution) ; 
 		Solution aux = newSolution;
@@ -100,7 +123,6 @@ public class RLIntensification {
 			newSolution.setRateFeuilleNo(numeroFeuille, delta); 
 			return newSolution;
 		}
-		
 		return null ; 
 	}
 	
@@ -115,8 +137,29 @@ public class RLIntensification {
 	
 	
 	 public static void main(String[] args) {
-		RLIntensification rli = new RLIntensification("../Solution/graphe-TD-sans-DL-sol.txt");
-		ArrayList<Solution> voisinage=rli.genereVoisinage();
+
+		try {
+			FileAgent fa = new FileAgent("../InstancesInt/sparse_10_30_3_7_I.full");
+			Foret foret=fa.processLineByLineForest();
+			
+			BorneCalc testBorneSup = new BorneCalc (foret) ;
+			
+			testBorneSup.borneSolution("sparse_10_30_3_7_I",1).getInFile();
+			
+			
+		 	System.out.println("Working Directory = " +
+			System.getProperty("user.dir"));
+		 	
+		 	
+			RLIntensification rli = new RLIntensification("../Solution/sparse_10_30_3_7_I_sol.full");
+			ArrayList<Solution> voisinage=rli.genereVoisinage();
+			
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		 
+		
 		
 		
 		 
