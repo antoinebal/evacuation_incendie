@@ -88,6 +88,15 @@ public class Foret {
 		throw new NoSuchElementException();
 
 	}
+	
+	Sommet getFeuilleWithID(int id) {
+		for (int i=0 ; i<cheminsEvac.size() ; i++) {
+				if (cheminsEvac.get(i).getFeuille().getId()==id) {
+					return cheminsEvac.get(i).getFeuille();
+				}
+		}
+		return null;
+	}
 
 	public void printForet() {
 		System.out.println("***FORET***");

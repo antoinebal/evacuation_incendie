@@ -16,5 +16,9 @@ public class FeuilleEvac {
 			this.tauxEvac=object.tauxEvac ; 
 			this.dateDebut=object.dateDebut; 
 		 }
+		 
+		 void setTauxEvac(int taux) {
+			 tauxEvac=taux;
+		 }
 }
 

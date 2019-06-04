@@ -1,6 +1,7 @@
 package evac;
 
 import java.io.IOException;
+import java.util.Random;
 import java.util.ArrayList;
 
 public class RLIntensification {
@@ -173,33 +174,87 @@ public class RLIntensification {
 	}
 	
 	void intensificationInvalid() {
+		boolean validite = false;
+		int compteur = 0;
 		checker = new Checker(solution);
-		
+		while (!validite) {
 		try {
-			if (checker.checkSolution()) {
-				System.out.println("Cette solution est sensÃ©e Ãªtre invalide");
-			}
-			System.out.println("Cette solution est sensÃ©e Ãªtre invalide");
+			checker.setSolution(solution);
+			validite=checker.checkSolution();
 		} catch (SolutionIncorrecteException e) {
-			e.printStackTrace();
-			
-			correction(e.getIDFeuillesSource(), e.getDepassement(), e.getFlux());
+			System.out.println("E : nbf : "+e.getIDFeuillesSource().size()+" dep : "+e.getDepassement()+" flux "+e.getFlux()+" capa "+(e.getFlux()-e.getDepassement()));
+			solution = correction(e.getIDFeuillesSource(), e.getDepassement(), e.getFlux(), 5);
+			compteur++;
 		} 
+		}
+		System.out.println("VALIDE "+compteur);
 	}
 	
-	void correction(ArrayList<Integer> idFeuillesSource, int depassement, int flux) {
+	
+	//corrige des solutions en changeant le taux des feuilles en argument
+	Solution correction(ArrayList<Integer> idFeuillesSource, int depassement, int flux, int diff) {
 		Solution newSolution = new Solution(solution) ; 
 		Solution aux = newSolution;
 		newSolution = this.solution;
 		this.solution = aux;
+		int capacite=flux-depassement;
+		boolean over = false;
+		int fluxCorr = flux;
+		int cptIterations = 0;
+		//contient les id de feuilles exclus de l'algo (car rate réduit au max)
+		ArrayList<Integer> blackList = new ArrayList<Integer>();
 		
-		//pour chaque feuille source, voir leur "part de responsabilitÃ©" dans le dÃ©passement
-		for (int i = 0 ; i < idFeuillesSource.size() ; i++) {
-			int idFeuille = idFeuillesSource.get(i);
-			int rate = solution.getFeuilleWithID(idFeuille).tauxEvac;
+		while (!over) {
+			//on récupère une feuille aléatoirement parmi les sources
+			int indexAleatoire = -1;
+			boolean test=true;
+			while (test) {
+				indexAleatoire = randInt(0, idFeuillesSource.size()-1);
+				test=blackList.contains(indexAleatoire);
+			}
 			
+			int idFeuille = idFeuillesSource.get(indexAleatoire);
+			//System.out.println("Feuille "+idFeuille+" récup d'index "+indexAleatoire);
+			//calcul fluxInduit actuel
+			//int pop = foret.getFeuilleWithID(idFeuille).getPop();
+			int rate = newSolution.getFeuilleWithID(idFeuille).tauxEvac;
+			
+			//System.out.println("Pop : "+pop+" ; rate : "+rate);
+			
+			//on regarde quel rate appliquer
+			int nouveauRate=0;
+			if (rate-diff <= 0) {
+				blackList.add(indexAleatoire);
+				nouveauRate=1;
+			} else {
+				nouveauRate=rate-diff;
+			}
+			newSolution.getFeuilleWithID(idFeuille).setTauxEvac(nouveauRate);
+			
+			//a-t-on assez changé le rate?
+			fluxCorr = fluxCorr - rate+nouveauRate;
+			if (fluxCorr <= capacite) {
+				over=true;
+				System.out.println("Trouvé");
+				return newSolution;
+				
+			}
+			
+			/*if (cptIterations>50) {
+				over=true;
+				System.out.println("Trop d'itérations");
+				return null;
+			}*/
+			cptIterations++;
 		}
-		
+		return null;
+						
+	}
+	
+	public static int randInt(int min, int max) {
+	    Random rand = new Random();
+	    int randomNum = rand.nextInt((max - min) + 1) + min;
+	    return randomNum;
 	}
 	
 	static void testDescente() {
@@ -241,18 +296,19 @@ public class RLIntensification {
 			Foret foret=fa.processLineByLineForest();
 			
 			BorneCalc testBorneInf = new BorneCalc (foret) ;
+			BorneCalc testBorneSup = new BorneCalc (foret) ;
 			
 			testBorneInf.borneSolution(nomInstance,0).comment = "calcul borne INF";
+			int avant = testBorneInf.borneSolution(nomInstance,0).fctObjectif;
 			testBorneInf.borneSolution(nomInstance,0).getInFile();
 			
-			/*Checker checkert = new Checker(testBorneSup.borneSolution(nomInstance,1)) ; 
-			boolean validite = checkert.checkSolution();
-		 	System.out.println(validite);*/
-		 	
+			int borneSup = testBorneSup.borneSolution(nomInstance, 1).fctObjectif;
+			
 			RLIntensification rli = new RLIntensification("Solution/"+nomInstance+"_sol.full");
 			
 			rli.intensification();
-			rli.solution.getInFile();		
+			
+			System.out.println("Avant : "+avant+" ; apres : "+rli.solution.fctObjectif+" ; borne sup : "+borneSup);
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
@@ -261,7 +317,9 @@ public class RLIntensification {
 	
 	 public static void main(String[] args) {
 		 testInvalid();
-		
+		 
+		 
+
 	 }
 	
 }

@@ -21,7 +21,7 @@ public class SolutionIncorrecteException extends Exception {
 	private static final long serialVersionUID = 1L;
 
 	public SolutionIncorrecteException(int id1, int id2, ArrayList<Integer> idfs, int depassement,int flux) {
-	System.out.println("DÃ©passement de "+depassement+" entre "+id1+" et "+id2+".");
+	System.out.println("Dépassement de "+depassement+" entre "+id1+" et "+id2+".");
 	idFeuillesSource=idfs;
 	this.depassement=depassement;
 	this.flux = flux;
