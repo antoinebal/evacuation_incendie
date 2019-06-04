@@ -77,16 +77,16 @@ public class RLIntensification {
 		
 		for (int i = 0 ; i < solution.nbFeuilleEvac ; i++) {
 			
-			for (int delta = 1 ; delta < 2 ; delta++) {
+			for (int delta = 50 ; delta < 150 ; delta++) {
 			Solution voisin1 = genereVoisinDate(i, delta);
 			if (voisin1 != null) {
 				voisinage.add(voisin1);
 				
 			} 
-			Solution voisin2 = genereVoisinRate(i, delta);
+			/*Solution voisin2 = genereVoisinRate(i, delta);
 			if (voisin2 != null) {
 				voisinage.add(voisin2);	
-			}
+			}*/
 			}
 		}
 		return voisinage;
@@ -181,6 +181,7 @@ public class RLIntensification {
 			
 			BorneCalc testBorneSup = new BorneCalc (foret) ;
 			
+			testBorneSup.borneSolution(nomInstance,1).comment = "calcul borne SUP";
 			testBorneSup.borneSolution(nomInstance,1).getInFile();
 			
 			/*Checker checkert = new Checker(testBorneSup.borneSolution(nomInstance,1)) ; 
