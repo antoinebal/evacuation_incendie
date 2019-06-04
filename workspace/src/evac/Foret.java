@@ -114,7 +114,7 @@ public class Foret {
 	public static void main(String[] args) {
 		try {
 			// on construit la forêt et la solution
-			FileAgent fa = new FileAgent("../InstancesInt/graphe-TD-sans-DL-data.txt");
+			FileAgent fa = new FileAgent("InstancesInt/graphe-TD-sans-DL-data.txt");
 			Foret foret = fa.processLineByLineForest();
 
 			System.out.println(foret.recupArc(0, 1));

@@ -70,8 +70,11 @@ public class BorneCalc {
 			chem = listChemin.get(i) ;
 			feuille = chem.getFeuille() ; 
 			cpt = feuille.getPop() ; 
-			while (cpt > feuille.maxPack_) {
-				cpt = cpt - feuille.maxPack_;
+			//on récupère la plus petite capacité du chemin
+			int capaMin = chem.getCapaciteMinimale(foret);
+			//on évacue avec un taux de capaMin
+			while (cpt >= capaMin) {
+				cpt = cpt - capaMin;
 				longTrain ++ ; 
 			}
 			 /* il reste peut être quelques personnes à passer, dont le nombre
@@ -133,10 +136,11 @@ public class BorneCalc {
 			s.tpsCalcul = (int) Duration.between(start, end).toMillis();
 			
 			for ( i=0 ; i<s.nbFeuilleEvac ; i++) { 
-				feuille = foret.cheminsEvac.get(i).getFeuille() ; 
+				Chemin chem = foret.cheminsEvac.get(i);
+				feuille = chem.getFeuille() ; 
 				// ajout d'une feuille a evacuer avec son id, maxpack qui sera son taux d'evacuation effectif, 
 				//et 0 sa date de début effective 
-				FeuilleEvac fe = new FeuilleEvac (feuille.id_ ,feuille.maxPack_,res.get(i)) ; 
+				FeuilleEvac fe = new FeuilleEvac (feuille.id_ ,chem.getCapaciteMinimale(foret),res.get(i)) ; 
 				s.feuilles.add(fe) ;
 				
 			} 
@@ -155,17 +159,17 @@ public class BorneCalc {
 		
 		
 		try {
-			FileAgent fa = new FileAgent("../InstancesInt/graphe-TD-sans-DL-data.txt");
+			FileAgent fa = new FileAgent("InstancesInt/medium_10_30_3_7_I.full");
 			Foret foret=fa.processLineByLineForest();
-			BorneCalc testBorneInf = new BorneCalc (foret) ;
+			//BorneCalc testBorneInf = new BorneCalc (foret) ;
 			BorneCalc testBorneSup = new BorneCalc (foret) ;
 			
-			testBorneInf.borneSolution("graphe-TD-sans-DL-data",0).getInFile(); 
-			testBorneSup.borneSolution("test_sup",1).getInFile(); 
+			//testBorneInf.borneSolution("medium_10_30_3_7_I",0).getInFile(); 
+			testBorneSup.borneSolution("medium_10_30_3_7_I",1).getInFile(); 
 		
 			
-			System.out.println(testBorneInf.borneInf());
-			
+			//System.out.println(testBorneInf.borneInf());
+			System.out.println(testBorneSup.borneSup());
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();

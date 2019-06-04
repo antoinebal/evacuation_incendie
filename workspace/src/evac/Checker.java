@@ -94,7 +94,7 @@ public class Checker {
 		    	//on construit la forêt et la solution
 		    	FileAgent fa = new FileAgent(fileName);
 				solution = fa.processLineByLineSolution();
-				FileAgent fa2 = new FileAgent("../InstancesInt/"+solution.nomInstance+".full");
+				FileAgent fa2 = new FileAgent("InstancesInt/"+solution.nomInstance+".full");
 				foret=fa2.processLineByLineForest();
 			} catch (IOException e) {
 				e.printStackTrace();
@@ -115,7 +115,7 @@ public class Checker {
 	
 	public void setSolution(Solution solution) {
 		this.solution=solution;
-		FileAgent fa2 = new FileAgent("../InstancesInt/"+solution.nomInstance+".full");
+		FileAgent fa2 = new FileAgent("InstancesInt/"+solution.nomInstance+".full");
 		try {
 			foret=fa2.processLineByLineForest();
 		} catch (IOException e) {
@@ -172,10 +172,10 @@ public class Checker {
 				}
 				
 				//on vérifie bien que le duedate > dateDebut
-				else if (debut > arc.getDateExp()) {
+				/*else if (debut > arc.getDateExp()) {
 					ok=false;
-					System.out.println("mauvaise date de début de la feuille "+idFeuille+" dans la solution");
-				}
+					System.out.println("mauvaise date de début de la feuille "+idFeuille+" dans la solution");*/
+				//}
 				else { 
 					//on va créer tous les events
 					
@@ -266,10 +266,10 @@ public class Checker {
 									System.out.println("Capa OK ("+flux+") entre "+noeudCourant.getSommet().getId()+" et "+sommetSuivant.getId());
 								}
 								
-								if (arc.dateExp < date) {
+								/*if (arc.dateExp < date) {
 									ok=false;
 									System.out.print("Arc expiré entre "+noeudCourant.getSommet().getId()+" et "+sommetSuivant.getId());
-								}
+								}*/
 								
 								//on crée le noeud associé au noeud suivant s'il n'existe pas
 								
@@ -311,8 +311,8 @@ public class Checker {
 	
 	 public static void main(String[] args) {
 
-		 Checker checker = new Checker("../Solution/graphe-TD-sans-DL-sol.txt");
-		 checker.checkSolution();
+		 Checker checker = new Checker("Solution/medium_10_30_3_7_I_sol.full");
+		 System.out.print(checker.checkSolution());
 		/* Path currentRelativePath = Paths.get("");
 		 String s = currentRelativePath.toAbsolutePath().toString();
 		 System.out.println("Current relative path is: " + s);*/

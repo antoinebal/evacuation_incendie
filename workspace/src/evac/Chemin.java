@@ -55,11 +55,29 @@ public class Chemin {
 		}
 	}
 	
+	/*
+	 * utile pour le calcul de la borne sup
+	 * retourne la plus petite capacité parmi
+	 * les arcs composant le chemin
+	 */
+	public int getCapaciteMinimale(Foret foret) {
+		int capaMin = Integer.MAX_VALUE;
+		for (int i = 0 ; i < chemin.size()-1 ; i++) {
+			int capa = foret.recupArc(chemin.get(i).getId(), chemin.get(i+1).getId()).getCapa();
+			if (capa < capaMin) {
+				capaMin = capa;
+			}
+		}
+		return capaMin;
+	}
+	
 	public static void main(String[] args) {
 		try {
 	    	//on construit la forêt et la solution
-	    	FileAgent fa = new FileAgent("../InstancesInt/graphe-TD-sans-DL-data.txt");
+	    	FileAgent fa = new FileAgent("InstancesInt/graphe-TD-sans-DL-data.txt");
 			Foret foret=fa.processLineByLineForest();
+			
+			System.out.println(foret.cheminsEvac.get(0).getCapaciteMinimale(foret));
 			
 			System.out.println(foret.recupArc(0, 1));
 		} catch (IOException e) {
