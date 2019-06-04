@@ -63,13 +63,10 @@ public class BorneCalc {
 		Sommet feuille ; 
 		ArrayList<Chemin> listChemin = foret.cheminsEvac ; 
 		int cpt,duree ;
-		
-		
-		datesDebut.add(0) ;
-		
+	
+		datesDebut.add(0) ;		
 		for (int i =0 ; i<listChemin.size() ; i++) { 
 			int longTrain=0 ; 
-			
 			chem = listChemin.get(i) ;
 			feuille = chem.getFeuille() ; 
 			cpt = feuille.getPop() ; 
@@ -81,7 +78,8 @@ public class BorneCalc {
 			 * est inférieur au taux
 			 */				
 			
-			if (cpt!=0) { longTrain++; 
+			if (cpt!=0) { 
+				longTrain++; 
 			} 
 			
 			duree= chem.dureeChemin(foret) + longTrain; // duree chemin ne prend pas en compte la date debut

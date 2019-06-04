@@ -103,7 +103,7 @@ public class Checker {
 	
 	public Checker(Solution solution) {
 		this.solution=solution;
-		FileAgent fa2 = new FileAgent("../InstancesInt/"+solution.nomInstance+".full");
+		FileAgent fa2 = new FileAgent("InstancesInt/"+solution.nomInstance+".full");
 		try {
 			foret=fa2.processLineByLineForest();
 		} catch (IOException e) {
@@ -137,28 +137,6 @@ public class Checker {
 			System.out.println("Erreur : nombre de feuilles à évacuer plus grand que le nombre de feuilles de la forêt!"); 
 		}
 		else { 
-			/* ici on voulait comparer pour chaque feuille de la soluce le taux d'évac
-			 * à celui qui est vraiment dans la forêt
-			 
-			for (int i=0 ; i<solution.nbFeuAVL<Integer, Integer>();illeEvac ; i++) {
-				
-				//Sommet feuille = solution.feuilles.get(i) ; // rendre feuillesevac public !
-				int txevacSol = solution.feuilles.get(i).tauxEvac ; 
-				int maxRateFo = getMaxRate() (des feuilles de la foret);
-				if (solution.feuilles.get(i)>foret (verif ok mais normalement deja bien fait) .
-			}*/
-			
-			
-			// Vérifier qu'on ne dépasse jamais la capacité des arc traversé
-			
-			// trouver les feuilles qui commencent à la date 0 et partir dessus
-			
-			// Pour chaque feuille, on a son taux evac
-			// Commencer à évacuer par des paquets de cet taille la en suivant le chemin et ajustant le tuple 
-			// (temps départ, nb pers sur cet arc à ce moment) 
-			
-			// TEMPS ??? T=0 ?? 
-			
 			//on parcourt toutes les feuilles de la solution et
 			//on crée tous les évènements
 			try {
@@ -228,11 +206,7 @@ public class Checker {
 						
 						//on met cptPop à 0 pour modéliser que tout le monde est sorti
 						cptPopulation=0;
-					}
-					
-				
-					
-					
+					}			
 				} 
 			} 
 			

@@ -100,7 +100,7 @@ public class Solution {
 			//si nom instance s'utilise avec ou sans this
 			// et s'il contient le .txt/full ou pas , apparement non 
 			
-			writer = new PrintWriter("../Solution/"+nomInstance+"_sol.full", "UTF-8");
+			writer = new PrintWriter("Solution/"+nomInstance+"_sol.full", "UTF-8");
 		
 			writer.println(nomInstance);
 			writer.println(nbFeuilleEvac);

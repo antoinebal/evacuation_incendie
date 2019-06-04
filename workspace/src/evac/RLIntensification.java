@@ -172,19 +172,19 @@ public class RLIntensification {
 		 	System.out.println("Working Directory = " +
 			System.getProperty("user.dir"));
 		 	String nomInstance = "medium_10_30_3_5_I" ; 
-			FileAgent fa = new FileAgent("../InstancesInt/"+nomInstance+".full");
+		 	
+			FileAgent fa = new FileAgent("InstancesInt/"+nomInstance+".full");
 			Foret foret=fa.processLineByLineForest();
 			
 			BorneCalc testBorneSup = new BorneCalc (foret) ;
 			
 			testBorneSup.borneSolution(nomInstance,1).getInFile();
 			
-			
 			Checker checkert = new Checker(testBorneSup.borneSolution(nomInstance,1)) ; 
 			boolean validite = checkert.checkSolution();
 		 	System.out.println(validite);
 		 	
-		/*	RLIntensification rli = new RLIntensification("../Solution/"+nomInstance+"_sol.full");
+		/*	RLIntensification rli = new RLIntensification("Solution/"+nomInstance+"_sol.full");
 			ArrayList<Solution> voisinage=rli.genereVoisinage();
 			
 			rli.intensification();
