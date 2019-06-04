@@ -20,7 +20,7 @@ public class RLIntensification {
 			e.printStackTrace();
 		}
 		this.checker = new Checker(solution);
-		FileAgent fa2 = new FileAgent("../InstancesInt/"+solution.nomInstance+".full");
+		FileAgent fa2 = new FileAgent("InstancesInt/"+solution.nomInstance+".full");
 		try {
 			foret = fa2.processLineByLineForest();
 		} catch (IOException e) {
@@ -32,7 +32,7 @@ public class RLIntensification {
 	RLIntensification(Solution solution) {
 		this.solution = solution;
 		this.checker = new Checker(solution);
-		FileAgent fa2 = new FileAgent("../InstancesInt/"+solution.nomInstance+".full");
+		FileAgent fa2 = new FileAgent("InstancesInt/"+solution.nomInstance+".full");
 		try {
 			foret = fa2.processLineByLineForest();
 		} catch (IOException e) {
@@ -129,11 +129,14 @@ public class RLIntensification {
 	}
 	
 	void intensificationValid() {
+		int compteur = 0;
 		boolean over=false;
 		while (!over) {
+			compteur++;
 			ArrayList<Solution> voisins = genereVoisinage();
+			System.out.println("Amas num : "+compteur);
 			
-			int minFctObj = Integer.MAX_VALUE;
+			int minFctObj = solution.fctObjectif;
 			int indexMeilleurVoisin = -1;
 			for (int i = 0 ; i < voisins.size() ; i++) {
 				checker.setSolution(voisins.get(i));
@@ -143,17 +146,17 @@ public class RLIntensification {
 						//ce voisin valide est le meilleur
 						minFctObj = voisins.get(i).fctObjectif;
 						indexMeilleurVoisin = i;
+						System.out.println("\n\n\nMeilleur voisin pris : "+minFctObj);
 					}
 				}
 			}
 			
 			//si aucun voisin meilleur trouvé, on arrête
 			if (indexMeilleurVoisin == -1) {
-				System.out.println("kikou " );
+				System.out.println("Descente finie" );
 				over=true;
 			} else {
 			//sinon le meilleur voisin devient la nouvelle solution
-				System.out.println("LOL " );
 				this.solution = voisins.get(indexMeilleurVoisin);
 			}		
 		}
@@ -180,16 +183,16 @@ public class RLIntensification {
 			
 			testBorneSup.borneSolution(nomInstance,1).getInFile();
 			
-			Checker checkert = new Checker(testBorneSup.borneSolution(nomInstance,1)) ; 
+			/*Checker checkert = new Checker(testBorneSup.borneSolution(nomInstance,1)) ; 
 			boolean validite = checkert.checkSolution();
-		 	System.out.println(validite);
+		 	System.out.println(validite);*/
 		 	
-		/*	RLIntensification rli = new RLIntensification("Solution/"+nomInstance+"_sol.full");
+			RLIntensification rli = new RLIntensification("Solution/"+nomInstance+"_sol.full");
 			ArrayList<Solution> voisinage=rli.genereVoisinage();
 			
 			rli.intensification();
 			
-			rli.solution.getInFile();*/
+			rli.solution.getInFile();
 			
 		} catch (IOException e) {
 			// TODO Auto-generated catch block

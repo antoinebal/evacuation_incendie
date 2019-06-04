@@ -155,7 +155,7 @@ public class Checker {
 				//on récup l'arc entre la feuille et le premier sommet du chemin d'évac
 				Sommet sommetSuivant = cheminEvac.getNoeudAt(1);
 				
-				cheminEvac.printChemin();
+				//cheminEvac.printChemin();
 				
 				Arc arc=null;
 				try {
@@ -168,7 +168,7 @@ public class Checker {
 				//on vérifie bien que le taux < capa arc
 				if (txEvacSol > arc.getCapa()) {
 					ok=false;
-					System.out.println("mauvais taux d'évac de la feuille "+idFeuille+" dans la solution");
+					//System.out.println("mauvais taux d'évac de la feuille "+idFeuille+" dans la solution");
 				}
 				
 				//on vérifie bien que le duedate > dateDebut
@@ -191,7 +191,7 @@ public class Checker {
 					while (cptPopulation > txEvacSol) {
 						noeud.addEvent(temps, txEvacSol);
 						cptPopulation = cptPopulation - txEvacSol;
-						System.out.println("Event ["+temps+" , "+txEvacSol+"] généré pour noeud "+noeud.getSommet().getId());
+						//System.out.println("Event ["+temps+" , "+txEvacSol+"] généré pour noeud "+noeud.getSommet().getId());
 						temps = temps + 1;
 						
 					}
@@ -202,7 +202,7 @@ public class Checker {
 					 */				
 					if (cptPopulation != 0) {
 						noeud.addEvent(temps, cptPopulation);
-						System.out.println("Event ["+temps+" , "+cptPopulation+"] généré pour noeud "+noeud.getSommet().getId());
+						//System.out.println("Event ["+temps+" , "+cptPopulation+"] généré pour noeud "+noeud.getSommet().getId());
 						
 						//on met cptPop à 0 pour modéliser que tout le monde est sorti
 						cptPopulation=0;
@@ -245,7 +245,7 @@ public class Checker {
 						
 						//ce noeud contient des events de la date minimale : on les traite
 						if (date==dateMin) {
-							System.out.println("Date : "+dateMin);
+							//System.out.println("Date : "+dateMin);
 							int flux = avlNC.remove(date);
 							//on récupère l'arc qui le lie au noeud suivant
 							Sommet sommetSuivant = noeudCourant.getChemin().getNoeudSuivant(noeudCourant.getSommet());
@@ -261,9 +261,9 @@ public class Checker {
 								//on vérifie si les events respectent bien les règles de l'arc
 								if (arc.capacite < flux) {
 									ok=false;
-									System.out.println("Capa dépassée ("+flux+") entre "+noeudCourant.getSommet().getId()+" et "+sommetSuivant.getId());
+									//System.out.println("Capa dépassée ("+flux+") entre "+noeudCourant.getSommet().getId()+" et "+sommetSuivant.getId());
 								} else {
-									System.out.println("Capa OK ("+flux+") entre "+noeudCourant.getSommet().getId()+" et "+sommetSuivant.getId());
+									//System.out.println("Capa OK ("+flux+") entre "+noeudCourant.getSommet().getId()+" et "+sommetSuivant.getId());
 								}
 								
 								/*if (arc.dateExp < date) {
@@ -284,7 +284,7 @@ public class Checker {
 									noeud.addEvent(date+arc.duree, flux);
 								}
 							} else {
-								System.out.println("On est au noeud safe");
+								//System.out.println("On est au noeud safe");
 							}
 						}				
 					}
@@ -293,7 +293,7 @@ public class Checker {
 			
 			if (ok) {
 				date++;
-				System.out.println("END DATE = "+date);
+				//System.out.println("END DATE = "+date);
 				//on change la fonction objectif
 				solution.fctObjectif = date;
 				solution.comment = "tchazzzou" ; 
