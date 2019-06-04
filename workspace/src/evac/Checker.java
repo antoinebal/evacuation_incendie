@@ -17,54 +17,63 @@ public class Checker {
 	
 	ArrayList<Noeud> noeuds = new ArrayList<Noeud>();
 	
-    /*
-	public class Event {
-		int temps ; 
-		int nbpers ;
+	
+    
+	public class Event { 
+		int nbPers ;
+		ArrayList<Integer> idFeuillesSource ; 
 		
-		void translation(int duree) {
-			temps = temps + duree;
+		Event (int nbPers, int idFeuilleSource) {
+			this.nbPers = nbPers;
+			idFeuillesSource = new ArrayList<Integer>();
+			idFeuillesSource.add(idFeuilleSource);
 		}
 		
-		 .sommet=sommet;.sommet=sommet;
-		avl = new TreeMap<Integer, Integer>();
-		chem
-		avl = new TreeMap<Integer, Integer>();
-		chem
+		void merge(Event e) {
+			this.nbPers+=e.nbPers;
+			this.idFeuillesSource.addAll(e.idFeuillesSource);
+		}
+		
+		int getNbPers() {
+			return nbPers;
+		}
+		ArrayList<Integer> getSources() {
+			return idFeuillesSource;
+		}
 	}
-	*/
+	
 	
 	public class Noeud {
 	private Sommet sommet;
-	private TreeMap<Integer, Integer> avl;
+	private TreeMap<Integer, Event> avl;
 	Chemin cheminEvac;
 	
 	Noeud(Sommet sommet, Chemin ce) {
 		this.sommet=sommet;
-		avl = new TreeMap<Integer, Integer>();
+		avl = new TreeMap<Integer, Event>();
 		cheminEvac=ce;
 	}
 	
-	void addEvent(int date, int flux) {
+	void addEvent(int date, Event e) {
 		if (avl.containsKey(date)) {
 			/*
 			 * si un event déjà associé à cette date est dans l'avl, 
 			 * on ajoute aux flux actuel qui y est associé le flux du nouvel
 			 * event généré
 			 */
-			int fluxActuel = avl.get(date);
-			avl.put(date, fluxActuel+flux);
+			avl.get(date).merge(e);
+			avl.put(date, avl.get(date));
 		} else {
 			/*
 			 * si aucun event n'a été crée pour cette date on le crée avec
 			 * le flux spécifié
 			 */
-			avl.put(date, flux);
+			avl.put(date, e);
 		}
 		
 	}
 	Sommet getSommet() {return sommet;}
-	TreeMap<Integer, Integer> getAVL() {return avl;}
+	TreeMap<Integer, Event> getAVL() {return avl;}
 	Chemin getChemin() {return cheminEvac;}
 	
 	
@@ -126,9 +135,10 @@ public class Checker {
 		noeuds.clear();
 	}
 	
-	public boolean checkSolution() {
+	
+	public boolean checkSolution() throws SolutionIncorrecteException {
 		
-		
+		//System.out.println("CHECK : ");
 		boolean ok = true ; 
 		//I : le nombre de feuilles est il correct?
 		int date=0;
@@ -168,6 +178,13 @@ public class Checker {
 				//on vérifie bien que le taux < capa arc
 				if (txEvacSol > arc.getCapa()) {
 					ok=false;
+	
+					//on remplit idFeuillesErreur pour une éventuelle correction
+					ArrayList<Integer> idFeuillesErreur = new ArrayList<Integer>();
+					idFeuillesErreur.add(idFeuille);
+					
+					//on throw l'exception
+					throw new SolutionIncorrecteException(idFeuille, sommetSuivant.getId(), idFeuillesErreur,txEvacSol-arc.getCapa(), txEvacSol);
 					//System.out.println("mauvais taux d'évac de la feuille "+idFeuille+" dans la solution");
 				}
 				
@@ -189,7 +206,7 @@ public class Checker {
 					//variable à être incrémentée
 					int temps = debut+arc.duree;
 					while (cptPopulation > txEvacSol) {
-						noeud.addEvent(temps, txEvacSol);
+						noeud.addEvent(temps, new Event(txEvacSol, feuille.getId()));
 						cptPopulation = cptPopulation - txEvacSol;
 						//System.out.println("Event ["+temps+" , "+txEvacSol+"] généré pour noeud "+noeud.getSommet().getId());
 						temps = temps + 1;
@@ -201,7 +218,7 @@ public class Checker {
 					 * est inférieur au taux
 					 */				
 					if (cptPopulation != 0) {
-						noeud.addEvent(temps, cptPopulation);
+						noeud.addEvent(temps, new Event(txEvacSol, feuille.getId()));
 						//System.out.println("Event ["+temps+" , "+cptPopulation+"] généré pour noeud "+noeud.getSommet().getId());
 						
 						//on met cptPop à 0 pour modéliser que tout le monde est sorti
@@ -219,7 +236,7 @@ public class Checker {
 				//on cherche la date minimale dans les events
 				for (int i=0 ; i < noeuds.size() ; i++) {
 					Noeud noeudCourant = noeuds.get(i);
-					TreeMap<Integer, Integer> avlNC = noeudCourant.getAVL();
+					TreeMap<Integer, Event> avlNC = noeudCourant.getAVL();
 					if (!(avlNC.isEmpty())) {
 						date = avlNC.firstKey();
 						if (date < dateMin) {
@@ -231,7 +248,7 @@ public class Checker {
 				for (int i=0 ; i < noeuds.size() ; i++) {
 					
 					Noeud noeudCourant = noeuds.get(i);
-					TreeMap<Integer, Integer> avlNC = noeudCourant.getAVL();
+					TreeMap<Integer, Event> avlNC = noeudCourant.getAVL();
 					
 					/*
 					 * le nombre de personnes partant depuis ce noeud
@@ -246,7 +263,9 @@ public class Checker {
 						//ce noeud contient des events de la date minimale : on les traite
 						if (date==dateMin) {
 							//System.out.println("Date : "+dateMin);
-							int flux = avlNC.remove(date);
+							//int flux = avlNC.remove(date);
+							Event event = avlNC.remove(date);
+							int flux = event.getNbPers();
 							//on récupère l'arc qui le lie au noeud suivant
 							Sommet sommetSuivant = noeudCourant.getChemin().getNoeudSuivant(noeudCourant.getSommet());
 							if (sommetSuivant != null) {
@@ -261,6 +280,14 @@ public class Checker {
 								//on vérifie si les events respectent bien les règles de l'arc
 								if (arc.capacite < flux) {
 									ok=false;
+									
+									/*
+									 * on écrit dans la variable idFeuillesErreur, spécifiant
+									 * toutes les feuilles dont sont issues les populations à 
+									 * l'origine de ce dépassement
+									 */
+									ArrayList<Integer> idFeuillesErreur = event.getSources();
+									throw new SolutionIncorrecteException(noeudCourant.getSommet().getId(), sommetSuivant.getId(), idFeuillesErreur,flux -arc.capacite, flux);
 									//System.out.println("Capa dépassée ("+flux+") entre "+noeudCourant.getSommet().getId()+" et "+sommetSuivant.getId());
 								} else {
 									//System.out.println("Capa OK ("+flux+") entre "+noeudCourant.getSommet().getId()+" et "+sommetSuivant.getId());
@@ -276,12 +303,12 @@ public class Checker {
 								int index=noeudExiste(sommetSuivant);
 								if (index!=-1) {
 									//si le noeud est déjà existant on y ajoute l'event avec date courante + la durée de l'arc
-									noeuds.get(index).addEvent(date+arc.duree, flux);
+									noeuds.get(index).addEvent(date+arc.duree, event);
 								} else {
 									//sinon on le crée et on lui ajoute l'event avec date courant + la durée de l'arc
 									Noeud noeud = new Noeud(sommetSuivant, noeudCourant.getChemin());
 									noeuds.add(noeud);
-									noeud.addEvent(date+arc.duree, flux);
+									noeud.addEvent(date+arc.duree, event);
 								}
 							} else {
 								//System.out.println("On est au noeud safe");
@@ -296,6 +323,7 @@ public class Checker {
 				//System.out.println("END DATE = "+date);
 				//on change la fonction objectif
 				solution.fctObjectif = date;
+				//System.out.println(date);
 				solution.comment = "tchazzzou" ; 
 			}
 				
@@ -311,8 +339,13 @@ public class Checker {
 	
 	 public static void main(String[] args) {
 
-		 Checker checker = new Checker("Solution/medium_10_30_3_7_I_sol.full");
-		 System.out.print(checker.checkSolution());
+		 Checker checker = new Checker("Solution/graphe-TD-sans-DL-datainf_sol.full");
+		 try {
+			System.out.println(checker.checkSolution());
+		} catch (SolutionIncorrecteException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 		/* Path currentRelativePath = Paths.get("");
 		 String s = currentRelativePath.toAbsolutePath().toString();
 		 System.out.println("Current relative path is: " + s);*/

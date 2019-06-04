@@ -9,7 +9,10 @@ public class RLIntensification {
 	Checker checker;
 	Foret foret;
 	
-
+	int DELTA_RANGE_INF=50;
+	int DELTA_RANGE_SUP=150;
+	
+	RLIntensification() {}
 	
 	RLIntensification(String fichierSolution) {
 		FileAgent fa = new FileAgent(fichierSolution);
@@ -77,7 +80,7 @@ public class RLIntensification {
 		
 		for (int i = 0 ; i < solution.nbFeuilleEvac ; i++) {
 			
-			for (int delta = 50 ; delta < 150 ; delta++) {
+			for (int delta = DELTA_RANGE_INF ; delta < DELTA_RANGE_SUP ; delta++) {
 			Solution voisin1 = genereVoisinDate(i, delta);
 			if (voisin1 != null) {
 				voisinage.add(voisin1);
@@ -140,20 +143,26 @@ public class RLIntensification {
 			int indexMeilleurVoisin = -1;
 			for (int i = 0 ; i < voisins.size() ; i++) {
 				checker.setSolution(voisins.get(i));
-				boolean validite = checker.checkSolution();
-				if (validite) {
-					if (voisins.get(i).fctObjectif < minFctObj) {
-						//ce voisin valide est le meilleur
-						minFctObj = voisins.get(i).fctObjectif;
-						indexMeilleurVoisin = i;
-						System.out.println("\n\n\nMeilleur voisin pris : "+minFctObj);
+				boolean validite=false;
+				try {
+					validite = checker.checkSolution();
+					if (validite) {
+						if (voisins.get(i).fctObjectif < minFctObj) {
+							//ce voisin valide est le meilleur
+							minFctObj = voisins.get(i).fctObjectif;
+							indexMeilleurVoisin = i;
+							System.out.println("\n\n\nMeilleur voisin pris : "+minFctObj);
+						}
 					}
+				} catch (SolutionIncorrecteException e) {
+					
 				}
+				
 			}
 			
 			//si aucun voisin meilleur trouvé, on arrête
 			if (indexMeilleurVoisin == -1) {
-				System.out.println("Descente finie" );
+				System.out.println("Descente finie ; meilleure solution : "+solution.fctObjectif);
 				over=true;
 			} else {
 			//sinon le meilleur voisin devient la nouvelle solution
@@ -164,12 +173,36 @@ public class RLIntensification {
 	}
 	
 	void intensificationInvalid() {
+		checker = new Checker(solution);
+		
+		try {
+			if (checker.checkSolution()) {
+				System.out.println("Cette solution est sensée être invalide");
+			}
+			System.out.println("Cette solution est sensée être invalide");
+		} catch (SolutionIncorrecteException e) {
+			e.printStackTrace();
+			
+			correction(e.getIDFeuillesSource(), e.getDepassement(), e.getFlux());
+		} 
+	}
+	
+	void correction(ArrayList<Integer> idFeuillesSource, int depassement, int flux) {
+		Solution newSolution = new Solution(solution) ; 
+		Solution aux = newSolution;
+		newSolution = this.solution;
+		this.solution = aux;
+		
+		//pour chaque feuille source, voir leur "part de responsabilité" dans le dépassement
+		for (int i = 0 ; i < idFeuillesSource.size() ; i++) {
+			int idFeuille = idFeuillesSource.get(i);
+			int rate = solution.getFeuilleWithID(idFeuille).tauxEvac;
+			
+		}
 		
 	}
 	
-	
-	 public static void main(String[] args) {
-
+	static void testDescente() {
 		try {
 
 		 	System.out.println("Working Directory = " +
@@ -189,7 +222,6 @@ public class RLIntensification {
 		 	System.out.println(validite);*/
 		 	
 			RLIntensification rli = new RLIntensification("Solution/"+nomInstance+"_sol.full");
-			ArrayList<Solution> voisinage=rli.genereVoisinage();
 			
 			rli.intensification();
 			
@@ -199,7 +231,37 @@ public class RLIntensification {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		}
+	}
 	
+	static void testInvalid() {
+		try {
+			String nomInstance = "medium_10_30_3_5_I" ;
+		 	
+			FileAgent fa = new FileAgent("InstancesInt/"+nomInstance+".full");
+			Foret foret=fa.processLineByLineForest();
+			
+			BorneCalc testBorneInf = new BorneCalc (foret) ;
+			
+			testBorneInf.borneSolution(nomInstance,0).comment = "calcul borne INF";
+			testBorneInf.borneSolution(nomInstance,0).getInFile();
+			
+			/*Checker checkert = new Checker(testBorneSup.borneSolution(nomInstance,1)) ; 
+			boolean validite = checkert.checkSolution();
+		 	System.out.println(validite);*/
+		 	
+			RLIntensification rli = new RLIntensification("Solution/"+nomInstance+"_sol.full");
+			
+			rli.intensification();
+			rli.solution.getInFile();		
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+	}
+	
+	
+	 public static void main(String[] args) {
+		 testInvalid();
+		
+	 }
 	
 }

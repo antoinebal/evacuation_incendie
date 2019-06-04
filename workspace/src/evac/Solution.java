@@ -92,6 +92,15 @@ public class Solution {
 		feuilles.get(i).dateDebut-=delta;
 	}
 	
+	FeuilleEvac getFeuilleWithID(int id) {
+		for (int i=0 ; i<feuilles.size() ; i++) {
+				if (feuilles.get(i).id==id) {
+					return feuilles.get(i);
+				}
+		}
+		return null;
+	}
+	
 	void getInFile () { 
 		
 		PrintWriter writer;

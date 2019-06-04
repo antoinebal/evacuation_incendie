@@ -37,7 +37,7 @@ public class FileAgent {
 		    //use a second Scanner to parse the content of each line 
 			if (!line.isEmpty()) {
 			if (line.charAt(0)!='c') {
-		    try(Scanner scanner = new Scanner(line)){
+		    try(Scanner scanner = new Scanner(line)) {
 		      scanner.useDelimiter(" ");
 		      
 		      // On a passé un c, on est sur la ligne 2 du fichier 
@@ -158,7 +158,7 @@ public class FileAgent {
 				 solution.ajoutFeuille(id, tauxEvac, dateDebut);
 			 } 
 			 
-			 else if ((state==2) && ((line.charAt(0)=='v') || (line.charAt(0)!='i')))  { 
+			 else if ((state==2) && ((line.charAt(0)=='v') || (line.charAt(0)=='i')))  { 
 				 solution.setValid(scanner.next());
 				 state++;
 			 }
