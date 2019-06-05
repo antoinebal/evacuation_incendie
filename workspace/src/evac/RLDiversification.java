@@ -9,7 +9,7 @@ public class RLDiversification {
 	Checker checker;
 	
 	int DELTA_RANGE_INF=50;
-	int DELTA_RANGE_SUP=150;
+	int DELTA_RANGE_SUP=300;
 	
 	//on ne s'autorise pas à générer des voisins
 	//avec des seuils aussi bas car inefficace
@@ -130,32 +130,40 @@ public class RLDiversification {
 		 
 	}
 	
-	Solution diversification(Solution solution, int fonctionObj) {
+	private Solution diversification(Solution solution, int maxIterations, int numIteration) {
+		if (numIteration >= maxIterations) {
+			return solution;
+		} else {
+			
+		System.out.println("Diversification à partir de "+solution.fctObjectif);
 		RLIntensification rli = new RLIntensification(solution);
-		int compteur = 0;
 		boolean found=false;
 		Solution voisinChoisi=null;
+		this.solution=solution;
 		ArrayList<Solution> voisins = genereVoisinage();
-		while (!found&&(!voisins.isEmpty())) {
-			this.solution=solution;
+		
+		while (!found&&!voisins.isEmpty()) {
 			
 			//on choisit un voisin aléatoire
-			int indexAleatoire = randInt(0, voisins.size());
-			
+			int indexAleatoire = randInt(0, voisins.size()-1);
+			voisinChoisi = voisins.get(indexAleatoire);
 			//on l'enlève pour ne pas le choisir deux fois
 			voisins.remove(indexAleatoire);
-	
-			voisinChoisi = voisins.get(indexAleatoire);
 			checker.setSolution(voisinChoisi);
 			try {
-				//si le voisin est valide, on a notre solution
+				//si le voisin est valide, on l'intensifie
 				checker.checkSolution();
 				rli.setSolution(voisinChoisi);
 				rli.intensification();
 				//si la solution issue de l'intensification est meilleure, on arrête
-				if (rli.solution.fctObjectif < fonctionObj) {
+				if (rli.solution.fctObjectif < solution.fctObjectif) {
 					found = true;
-					return rli.solution;
+					Solution sDiv = diversification(rli.solution, maxIterations, numIteration+1);
+					if (sDiv==null) {
+						return rli.solution;
+					} else {
+						return sDiv; 
+					}
 				}
 			} catch (SolutionIncorrecteException e) {
 				
@@ -165,6 +173,8 @@ public class RLDiversification {
 	
 		}
 		return null;
+		
+		}
 		 
 	}
 	
@@ -190,7 +200,7 @@ public class RLDiversification {
 		rli.intensification();
 		int meilleureFctObjLocale = rli.solution.fctObjectif;
 		
-		Solution sDiv = rld.diversification(rli.solution, meilleureFctObjLocale);
+		Solution sDiv = rld.diversification(rli.solution, 1, 0);
 		int foDiv=0;
 		if (sDiv!=null) {
 			/*
