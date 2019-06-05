@@ -19,6 +19,12 @@ public class SolutionIncorrecteException extends Exception {
 	private int flux;
 	
 	private static final long serialVersionUID = 1L;
+	
+	public SolutionIncorrecteException() {
+		idFeuillesSource=null;
+		this.depassement=0;
+		this.flux = 0;
+	}
 
 	public SolutionIncorrecteException(int id1, int id2, ArrayList<Integer> idfs, int depassement,int flux) {
 	//System.out.println("D�passement de "+depassement+" entre "+id1+" et "+id2+".");

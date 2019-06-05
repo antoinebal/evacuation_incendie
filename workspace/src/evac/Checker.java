@@ -18,9 +18,21 @@ public class Checker {
 	ArrayList<Noeud> noeuds = new ArrayList<Noeud>();
 	
 	
-    
+    /*
+     * les évènements représentent un flux de personne sur
+     * un arc à un instant donné.
+     * Ils sont voués à être propagés de noeuds en noeuds,
+     * où ils sont rangés dans des AVL en fonction de leur date.
+     */
 	public class Event { 
+		//le flux de personne
 		int nbPers ;
+		
+		/*
+		 * liste des ids des feuilles ayant contribué
+		 * au flux de personnes de cet event.
+		 * Utile pour corriger des erreurs invalides
+		 */
 		ArrayList<Integer> idFeuillesSource ; 
 		
 		Event (int nbPers, int idFeuilleSource) {
@@ -29,8 +41,10 @@ public class Checker {
 			idFeuillesSource.add(idFeuilleSource);
 		}
 		
+		//rassembler deux évènement en un
 		void merge(Event e) {
 			this.nbPers+=e.nbPers;
+			//on concatène les listes de feuilles source
 			this.idFeuillesSource.addAll(e.idFeuillesSource);
 		}
 		
@@ -43,6 +57,11 @@ public class Checker {
 	}
 	
 	
+	/*
+	 * classe expréssément créée pour le checker.
+	 * Il s'en sert pour associer chaque noeud intermédiaire
+	 * à son AVL d'évènements
+	 */
 	public class Noeud {
 	private Sommet sommet;
 	private TreeMap<Integer, Event> avl;
@@ -75,17 +94,20 @@ public class Checker {
 	Sommet getSommet() {return sommet;}
 	TreeMap<Integer, Event> getAVL() {return avl;}
 	Chemin getChemin() {return cheminEvac;}
-	
-	
 	}
 	
+	
+	/*
+	 * renvoie son numéro dans la liste noeuds
+	 * si le noeud correspondant à sommet y est présent,
+	 * retourne -1 sinon
+	 */
 	public int noeudExiste(Sommet sommet) {
 		boolean found=false;
 		int no = 0;
 		while ((!found)&&(no < noeuds.size())) {
 			if (noeuds.get(no).getSommet().getId()==sommet.getId()) {
 				found=true;
-				
 			} else {
 				no++;
 			}
@@ -97,7 +119,7 @@ public class Checker {
 		}
 	}
 	
-	
+	//le checker construit la solution à partir du path
 	public Checker (String fileName){
 		    try {
 		    	//on construit la forÃªt et la solution
@@ -122,7 +144,7 @@ public class Checker {
 	}
 	
 	
-	//change la foret et la solution
+	//change la solution et met à jour la forêt
 	public void setSolutionEtForet(Solution solution) {
 		this.solution=solution;
 		FileAgent fa2 = new FileAgent("InstancesInt/"+solution.nomInstance+".full");
@@ -142,20 +164,33 @@ public class Checker {
 		noeuds.clear();
 	}
 	
-	
+	/*
+	 * vérifie la validité de la solution en attribut du checker.
+	 * ce checker vérifie : 
+	 * > si le nombre de feuilles de la solution est correct
+	 * > si la solution n'induit pas de dépassements de capacités d'arcs
+	 */
 	public boolean checkSolution() throws SolutionIncorrecteException {
-		
-		//System.out.println("CHECK : ");
 		boolean ok = true ; 
-		//I : le nombre de feuilles est il correct?
+		
+		//> le nombre de feuilles est il correct?
 		int date=0;
+		/*
+		 *  on vérifie simplement que le nombre de feuilles de la solution
+		 *  est bien inférieur ou égal au nombre de feuilles dans la forêt
+		 */
 		if (solution.nbFeuilleEvac > foret.nbFeuille) { 
 			ok = false ;
-			System.out.println("Erreur : nombre de feuilles Ã  Ã©vacuer plus grand que le nombre de feuilles de la forÃªt!"); 
+			System.out.println("Erreur : nombre de feuilles Ã  Ã©vacuer plus grand que le nombre de feuilles de la forÃªt!");
+			throw new SolutionIncorrecteException();
 		}
+		//> une capacité est elle dépassée?
 		else { 
-			//on parcourt toutes les feuilles de la solution et
-			//on crÃ©e tous les Ã©vÃ¨nements
+
+			/*
+			 * Etape 1 : on parcourt toutes le feuilles de la solution
+			 * et on crée tous les évènements
+			 */
 			try {
 			for (int i=0 ; i<solution.nbFeuilleEvac ; i++) { 
 				
@@ -170,10 +205,7 @@ public class Checker {
 				Sommet feuille = cheminEvac.feuille;
 				
 				//on rÃ©cup l'arc entre la feuille et le premier sommet du chemin d'Ã©vac
-				Sommet sommetSuivant = cheminEvac.getNoeudAt(1);
-				
-				//cheminEvac.printChemin();
-				
+				Sommet sommetSuivant = cheminEvac.getNoeudAt(1);				
 				Arc arc=null;
 				try {
 					arc = foret.recupArc(idFeuille, sommetSuivant.getId());
@@ -182,27 +214,22 @@ public class Checker {
 					System.out.println("PB en cherchant l'arc entre "+idFeuille+" et "+sommetSuivant.getId());
 				}
 				
-				//on vÃ©rifie bien que le taux < capa arc
+				//on vÃ©rifie bien que le taux de la feuille < capa arc
 				if (txEvacSol > arc.getCapa()) {
 					ok=false;
 	
-					//on remplit idFeuillesErreur pour une Ã©ventuelle correction
 					ArrayList<Integer> idFeuillesErreur = new ArrayList<Integer>();
-					idFeuillesErreur.add(idFeuille);
-					
-					//on throw l'exception
+					idFeuillesErreur.add(idFeuille);				
 					throw new SolutionIncorrecteException(idFeuille, sommetSuivant.getId(), idFeuillesErreur,txEvacSol-arc.getCapa(), txEvacSol);
-					//System.out.println("mauvais taux d'Ã©vac de la feuille "+idFeuille+" dans la solution");
 				}
 				
-				//on vÃ©rifie bien que le duedate > dateDebut
+				
 				/*else if (debut > arc.getDateExp()) {
 					ok=false;
 					System.out.println("mauvaise date de dÃ©but de la feuille "+idFeuille+" dans la solution");*/
 				//}
-				else { 
-					//on va crÃ©er tous les events
-					
+				else { 				
+					//on va crÃ©er tous les events					
 					//compteur qui va Ãªtre dÃ©crÃ©mentÃ© Ã  mesure que les events sont crÃ©es 
 					int cptPopulation=feuille.getPop();
 					
@@ -215,9 +242,7 @@ public class Checker {
 					while (cptPopulation > txEvacSol) {
 						noeud.addEvent(temps, new Event(txEvacSol, feuille.getId()));
 						cptPopulation = cptPopulation - txEvacSol;
-						//System.out.println("Event ["+temps+" , "+txEvacSol+"] gÃ©nÃ©rÃ© pour noeud "+noeud.getSommet().getId());
 						temps = temps + 1;
-						
 					}
 					
 					/*
@@ -226,25 +251,36 @@ public class Checker {
 					 */				
 					if (cptPopulation != 0) {
 						noeud.addEvent(temps, new Event(txEvacSol, feuille.getId()));
-						//System.out.println("Event ["+temps+" , "+cptPopulation+"] gÃ©nÃ©rÃ© pour noeud "+noeud.getSommet().getId());
-						
 						//on met cptPop Ã  0 pour modÃ©liser que tout le monde est sorti
 						cptPopulation=0;
 					}			
 				} 
 			} 
 			
-			//on vient de parcourir les feuilles
-			int compteurAVLVides=0;
-			while (ok&&(compteurAVLVides!=noeuds.size())) {
-				compteurAVLVides=0;
-				int dateMin=Integer.MAX_VALUE;
+			/*
+			 * Etape 2 : maintenant que nous venons de créer tous les events,
+			 * les opérations suivantes vont être répétées jusqu'à ce que tous les AVL
+			 * soient vides (i.e. qu'il n'y ait plus aucun event à propager) ou qu'il
+			 * soit avéré que la solution est invalide.
+			 * 1. on cherche la date minimale parmi tous les events
+			 * 2. on parcourt la liste des noeuds intermédiaires : 
+			 * 		si leur AVL contient un event associé à la date
+			 * 		minimale, on vérifie que son flux ne dépasse pas
+			 * 		la capacité de l'arc liant son noeud au suivant.
+			 * 			si c'est le cas, on lève une SolutionIncorrecteException
+			 * 			sinon, on le propage
+			 */
+			boolean avlPleins=true;
+			while (ok&&avlPleins) {
 				
-				//on cherche la date minimale dans les events
+				avlPleins=false;
+				int dateMin=Integer.MAX_VALUE;
+				//1. on cherche la date minimale parmi tous les events
 				for (int i=0 ; i < noeuds.size() ; i++) {
 					Noeud noeudCourant = noeuds.get(i);
 					TreeMap<Integer, Event> avlNC = noeudCourant.getAVL();
 					if (!(avlNC.isEmpty())) {
+						avlPleins=avlPleins||true;
 						date = avlNC.firstKey();
 						if (date < dateMin) {
 							dateMin=date;
@@ -252,27 +288,26 @@ public class Checker {
 					}
 				}
 				
+				/*
+				 * 2. on parcourt la liste des noeuds intermédiaires : 
+				 * 		si leur AVL contient un event associé à la date
+				 * 		minimale, on vérifie que son flux ne dépasse pas
+				 * 		la capacité de l'arc liant son noeud au suivant.
+				 * 			si c'est le cas, on lève une SolutionIncorrecteException
+				 * 			sinon, on le propage
+				 */
 				for (int i=0 ; i < noeuds.size() ; i++) {
-					
 					Noeud noeudCourant = noeuds.get(i);
 					TreeMap<Integer, Event> avlNC = noeudCourant.getAVL();
-					
-					/*
-					 * le nombre de personnes partant depuis ce noeud
-					 * au temps courant
-					 */
-					if (avlNC.isEmpty()) {
-						compteurAVLVides++;
-					} else {
+
+					if (!avlNC.isEmpty()) {
 						date = avlNC.firstKey();
-						
-						
+			
 						//ce noeud contient des events de la date minimale : on les traite
 						if (date==dateMin) {
-							//System.out.println("Date : "+dateMin);
-							//int flux = avlNC.remove(date);
 							Event event = avlNC.remove(date);
 							int flux = event.getNbPers();
+							
 							//on rÃ©cupÃ¨re l'arc qui le lie au noeud suivant
 							Sommet sommetSuivant = noeudCourant.getChemin().getNoeudSuivant(noeudCourant.getSommet());
 							if (sommetSuivant != null) {
@@ -295,18 +330,14 @@ public class Checker {
 									 */
 									ArrayList<Integer> idFeuillesErreur = event.getSources();
 									throw new SolutionIncorrecteException(noeudCourant.getSommet().getId(), sommetSuivant.getId(), idFeuillesErreur,flux -arc.capacite, flux);
-									//System.out.println("Capa dÃ©passÃ©e ("+flux+") entre "+noeudCourant.getSommet().getId()+" et "+sommetSuivant.getId());
-								} else {
-									//System.out.println("Capa OK ("+flux+") entre "+noeudCourant.getSommet().getId()+" et "+sommetSuivant.getId());
-								}
+								} 
 								
 								/*if (arc.dateExp < date) {
 									ok=false;
 									System.out.print("Arc expirÃ© entre "+noeudCourant.getSommet().getId()+" et "+sommetSuivant.getId());
 								}*/
 								
-								//on crÃ©e le noeud associÃ© au noeud suivant s'il n'existe pas
-								
+								//on crÃ©e le noeud associÃ© au noeud suivant s'il n'existe pas dans notre liste								
 								int index=noeudExiste(sommetSuivant);
 								if (index!=-1) {
 									//si le noeud est dÃ©jÃ  existant on y ajoute l'event avec date courante + la durÃ©e de l'arc
@@ -317,8 +348,6 @@ public class Checker {
 									noeuds.add(noeud);
 									noeud.addEvent(date+arc.duree, event);
 								}
-							} else {
-								//System.out.println("On est au noeud safe");
 							}
 						}				
 					}
@@ -327,11 +356,9 @@ public class Checker {
 			
 			if (ok) {
 				date++;
-				//System.out.println("END DATE = "+date);
-				//on change la fonction objectif
 				solution.fctObjectif = date;
-				//System.out.println(date);
-				solution.comment = "tchazzzou" ; 
+				solution.valid="valid";
+				System.out.println(date);
 				return ok;
 			}
 				
@@ -346,20 +373,7 @@ public class Checker {
 	
 	
 	 public static void main(String[] args) {
-		 String nomInstance="graphe-TD-sans-DL-data";
-		 FileAgent fa = new FileAgent("InstancesInt/"+nomInstance+".full");
-		Foret foret=null;
-		try {
-			foret = fa.processLineByLineForest();
-		} catch (IOException e1) {
-			// TODO Auto-generated catch block
-			e1.printStackTrace();
-		}
-			BorneCalc testBorneInf = new BorneCalc (foret) ;
-			
-			
-			testBorneInf.borneSolution(nomInstance,0).getInFile(); 
-		 Checker checker = new Checker("Solution/"+nomInstance+"_sol.full");
+		 Checker checker = new Checker("Solution/graphe-TD-sans-DL-sol.txt");
 		 
 		 try {
 			System.out.println(checker.checkSolution());
