@@ -20,5 +20,13 @@ public class FeuilleEvac {
 		 void setTauxEvac(int taux) {
 			 tauxEvac=taux;
 		 }
+		 
+		 void setDateDebut(int date) {
+			 dateDebut=date;
+		 }
+		 
+		 public String toString() {
+			 return "id : "+id+" ; taux evac : "+tauxEvac+" ; date debut : "+dateDebut;
+		 }
 }
 

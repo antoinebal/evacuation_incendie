@@ -130,6 +130,14 @@ public class Solution {
 		}
 	}
 	
+	public void print() { 
+		System.out.println("Fct obj : "+this.fctObjectif);
+		for (int i=0 ; i<feuilles.size() ; i++) {
+			System.out.println(feuilles.get(i).toString());
+	}
+		
+	}
+	
 	
 	
 //	GET IN FILE TEST 

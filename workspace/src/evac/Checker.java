@@ -338,8 +338,21 @@ public class Checker {
 	
 	
 	 public static void main(String[] args) {
-
-		 Checker checker = new Checker("Solution/graphe-TD-sans-DL-datainf_sol.full");
+		 String nomInstance="graphe-TD-sans-DL-data";
+		 FileAgent fa = new FileAgent("InstancesInt/"+nomInstance+".full");
+		Foret foret=null;
+		try {
+			foret = fa.processLineByLineForest();
+		} catch (IOException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		}
+			BorneCalc testBorneInf = new BorneCalc (foret) ;
+			
+			
+			testBorneInf.borneSolution(nomInstance,0).getInFile(); 
+		 Checker checker = new Checker("Solution/"+nomInstance+"_sol.full");
+		 
 		 try {
 			System.out.println(checker.checkSolution());
 		} catch (SolutionIncorrecteException e) {

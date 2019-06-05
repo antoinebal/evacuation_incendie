@@ -182,8 +182,10 @@ public class RLIntensification {
 			checker.setSolution(solution);
 			validite=checker.checkSolution();
 		} catch (SolutionIncorrecteException e) {
-			System.out.println("E : nbf : "+e.getIDFeuillesSource().size()+" dep : "+e.getDepassement()+" flux "+e.getFlux()+" capa "+(e.getFlux()-e.getDepassement()));
-			solution = correction(e.getIDFeuillesSource(), e.getDepassement(), e.getFlux(), 5);
+			System.out.println("E : nbf : "+e.getIDFeuillesSource().size()+" ; dep : "+e.getDepassement()+" ; flux "+e.getFlux()+" ; capa "+(e.getFlux()-e.getDepassement()));
+			solution.print();
+			solution = correctionDateEtRate(e.getIDFeuillesSource(), 5, 5);
+			//solution = correctionRate(e.getIDFeuillesSource(), e.getDepassement(), e.getFlux(), 5);
 			compteur++;
 		} 
 		}
@@ -192,7 +194,7 @@ public class RLIntensification {
 	
 	
 	//corrige des solutions en changeant le taux des feuilles en argument
-	Solution correction(ArrayList<Integer> idFeuillesSource, int depassement, int flux, int diff) {
+	Solution correctionRate(ArrayList<Integer> idFeuillesSource, int depassement, int flux, int diff) {
 		Solution newSolution = new Solution(solution) ; 
 		Solution aux = newSolution;
 		newSolution = this.solution;
@@ -201,20 +203,18 @@ public class RLIntensification {
 		boolean over = false;
 		int fluxCorr = flux;
 		int cptIterations = 0;
-		//contient les id de feuilles exclus de l'algo (car rate réduit au max)
-		ArrayList<Integer> blackList = new ArrayList<Integer>();
+
 		
 		while (!over) {
-			//on récupère une feuille aléatoirement parmi les sources
+			//on rï¿½cupï¿½re une feuille alï¿½atoirement parmi les sources
 			int indexAleatoire = -1;
 			boolean test=true;
-			while (test) {
+			if (!idFeuillesSource.isEmpty()) {
 				indexAleatoire = randInt(0, idFeuillesSource.size()-1);
-				test=blackList.contains(indexAleatoire);
 			}
 			
 			int idFeuille = idFeuillesSource.get(indexAleatoire);
-			//System.out.println("Feuille "+idFeuille+" récup d'index "+indexAleatoire);
+			//System.out.println("Feuille "+idFeuille+" rï¿½cup d'index "+indexAleatoire);
 			//calcul fluxInduit actuel
 			//int pop = foret.getFeuilleWithID(idFeuille).getPop();
 			int rate = newSolution.getFeuilleWithID(idFeuille).tauxEvac;
@@ -224,25 +224,25 @@ public class RLIntensification {
 			//on regarde quel rate appliquer
 			int nouveauRate=0;
 			if (rate-diff <= 0) {
-				blackList.add(indexAleatoire);
+				idFeuillesSource.remove(indexAleatoire);
 				nouveauRate=1;
 			} else {
 				nouveauRate=rate-diff;
 			}
 			newSolution.getFeuilleWithID(idFeuille).setTauxEvac(nouveauRate);
 			
-			//a-t-on assez changé le rate?
+			//a-t-on assez changï¿½ le rate?
 			fluxCorr = fluxCorr - rate+nouveauRate;
 			if (fluxCorr <= capacite) {
 				over=true;
-				System.out.println("Trouvé");
+				System.out.println("TrouvÃ© : "+fluxCorr);
 				return newSolution;
 				
 			}
 			
 			/*if (cptIterations>50) {
 				over=true;
-				System.out.println("Trop d'itérations");
+				System.out.println("Trop d'itï¿½rations");
 				return null;
 			}*/
 			cptIterations++;
@@ -250,6 +250,55 @@ public class RLIntensification {
 		return null;
 						
 	}
+	
+	//corrige des solutions en changeant le taux des feuilles en argument
+		Solution correctionDateEtRate(ArrayList<Integer> idFeuillesSource, int diffRate, int diffDate) {
+			Solution newSolution = new Solution(solution) ; 
+			Solution aux = newSolution;
+			newSolution = this.solution;
+			this.solution = aux;
+			boolean over = false;
+			int cptIterations = 0;
+
+			
+			while (!over) {
+				//on rï¿½cupï¿½re une feuille alï¿½atoirement parmi les sources
+				int indexAleatoire = -1;
+				boolean test=true;
+				if (!idFeuillesSource.isEmpty()) {
+					indexAleatoire = randInt(0, idFeuillesSource.size()-1);
+				}
+				
+				int idFeuille = idFeuillesSource.get(indexAleatoire);
+				//System.out.println("Feuille "+idFeuille+" rï¿½cup d'index "+indexAleatoire);
+				//calcul fluxInduit actuel
+				//int pop = foret.getFeuilleWithID(idFeuille).getPop();
+				int rate = newSolution.getFeuilleWithID(idFeuille).tauxEvac;
+				int date = newSolution.getFeuilleWithID(idFeuille).tauxEvac;
+				
+				//System.out.println("Pop : "+pop+" ; rate : "+rate);
+				
+				//on regarde quel rate appliquer
+				int nouveauRate=0;
+				if (rate-diffRate <= 0) {
+					idFeuillesSource.remove(indexAleatoire);
+					nouveauRate=1;
+				} else {
+					nouveauRate=rate-diffRate;
+				
+				}
+				
+				newSolution.getFeuilleWithID(idFeuille).setTauxEvac(nouveauRate);
+				newSolution.getFeuilleWithID(idFeuille).setDateDebut(date+diffDate);
+				
+				if (cptIterations>4) {
+					over=true;
+				}
+				cptIterations++;
+			}
+			return newSolution;
+							
+		}
 	
 	public static int randInt(int min, int max) {
 	    Random rand = new Random();
@@ -259,10 +308,7 @@ public class RLIntensification {
 	
 	static void testDescente() {
 		try {
-
-		 	System.out.println("Working Directory = " +
-			System.getProperty("user.dir"));
-		 	String nomInstance = "medium_10_30_3_5_I" ; 
+		 	String nomInstance = "sparse_10_30_3_7_I" ; 
 		 	
 			FileAgent fa = new FileAgent("InstancesInt/"+nomInstance+".full");
 			Foret foret=fa.processLineByLineForest();
@@ -290,7 +336,7 @@ public class RLIntensification {
 	
 	static void testInvalid() {
 		try {
-			String nomInstance = "medium_10_30_3_5_I" ;
+			String nomInstance = "sparse_10_30_3_7_I" ;
 		 	
 			FileAgent fa = new FileAgent("InstancesInt/"+nomInstance+".full");
 			Foret foret=fa.processLineByLineForest();
@@ -307,7 +353,7 @@ public class RLIntensification {
 			RLIntensification rli = new RLIntensification("Solution/"+nomInstance+"_sol.full");
 			
 			rli.intensification();
-			
+			rli.solution.getInFile();
 			System.out.println("Avant : "+avant+" ; apres : "+rli.solution.fctObjectif+" ; borne sup : "+borneSup);
 		} catch (IOException e) {
 			e.printStackTrace();
@@ -317,7 +363,7 @@ public class RLIntensification {
 	
 	 public static void main(String[] args) {
 		 testInvalid();
-		 
+		// testDescente();
 		 
 
 	 }
