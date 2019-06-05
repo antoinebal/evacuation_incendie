@@ -170,6 +170,8 @@ public class Checker {
 	 * > si le nombre de feuilles de la solution est correct
 	 * > si la solution n'induit pas de dépassements de capacités d'arcs
 	 */
+	//cette version de checkSolution établit elle même la fonction
+	//objectif sans vérifier celle déjà existante
 	public boolean checkSolution() throws SolutionIncorrecteException {
 		boolean ok = true ; 
 		
@@ -188,7 +190,7 @@ public class Checker {
 		else { 
 
 			/*
-			 * Etape 1 : on parcourt toutes le feuilles de la solution
+			 * Etape 1 : on parcourt toutes les feuilles de la solution
 			 * et on crée tous les évènements
 			 */
 			try {
