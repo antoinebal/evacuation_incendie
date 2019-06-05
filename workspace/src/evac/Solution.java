@@ -85,7 +85,7 @@ public class Solution {
 	}
 	
 	void setRateFeuilleNo(int i, int delta) {
-		feuilles.get(i).tauxEvac+=delta;
+		feuilles.get(i).tauxEvac-=delta;
 	}
 	
 	void setDateFeuilleNo(int i, int delta) {

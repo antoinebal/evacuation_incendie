@@ -48,8 +48,12 @@ public class RLIntensification {
 	RLIntensification(Solution solution, Foret foret) {
 		this.solution = solution;
 		this.foret = foret;
+		this.checker = new Checker(solution);
 	}
 	
+	void setSolution(Solution s) {
+		solution = s;
+	}
 	
 	
 	/*
@@ -76,7 +80,6 @@ public class RLIntensification {
 	 * voisin car tous les autres étaient non valables
 	 */
 	public ArrayList<Solution> genereVoisinage() {
-		int echecVoisin=0;
 		ArrayList<Solution> voisinage = new ArrayList<Solution>();
 		
 		for (int i = 0 ; i < solution.nbFeuilleEvac ; i++) {
@@ -156,11 +159,9 @@ public class RLIntensification {
 						}
 					}
 				} catch (SolutionIncorrecteException e) {
-					
-				}
-				
+
+				}	
 			}
-			
 			//si aucun voisin meilleur trouvé, on arrête
 			if (indexMeilleurVoisin == -1) {
 				System.out.println("Descente finie ; meilleure solution : "+solution.fctObjectif);
@@ -204,7 +205,6 @@ public class RLIntensification {
 		int fluxCorr = flux;
 		int cptIterations = 0;
 
-		
 		while (!over) {
 			//on r�cup�re une feuille al�atoirement parmi les sources
 			int indexAleatoire = -1;
@@ -308,15 +308,19 @@ public class RLIntensification {
 	
 	static void testDescente() {
 		try {
-		 	String nomInstance = "sparse_10_30_3_7_I" ; 
+		 	String nomInstance = "dense_10_30_3_10_I" ; 
 		 	
 			FileAgent fa = new FileAgent("InstancesInt/"+nomInstance+".full");
 			Foret foret=fa.processLineByLineForest();
 			
 			BorneCalc testBorneSup = new BorneCalc (foret) ;
 			
-			testBorneSup.borneSolution(nomInstance,1).comment = "calcul borne SUP";
-			testBorneSup.borneSolution(nomInstance,1).getInFile();
+			Solution sBorneSup = testBorneSup.borneSolution(nomInstance,1);
+			
+			sBorneSup.comment = "calcul borne SUP";
+			sBorneSup.getInFile();
+			
+			int vBorneSup = sBorneSup.fctObjectif;
 			
 			/*Checker checkert = new Checker(testBorneSup.borneSolution(nomInstance,1)) ; 
 			boolean validite = checkert.checkSolution();
@@ -327,7 +331,7 @@ public class RLIntensification {
 			rli.intensification();
 			
 			rli.solution.getInFile();
-			
+			System.out.println("Borne sup : "+vBorneSup+" ; après descente : "+rli.solution.fctObjectif);
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -336,7 +340,7 @@ public class RLIntensification {
 	
 	static void testInvalid() {
 		try {
-			String nomInstance = "sparse_10_30_3_7_I" ;
+			String nomInstance = "sparse_10_30_3_5_I" ;
 		 	
 			FileAgent fa = new FileAgent("InstancesInt/"+nomInstance+".full");
 			Foret foret=fa.processLineByLineForest();
@@ -352,9 +356,15 @@ public class RLIntensification {
 			
 			RLIntensification rli = new RLIntensification("Solution/"+nomInstance+"_sol.full");
 			
-			rli.intensification();
+			int minFctObj = Integer.MAX_VALUE;
+			for (int i = 0 ; i < 500 ; i++) {
+				rli.intensification();
+				if (rli.solution.fctObjectif < minFctObj) {
+					minFctObj = rli.solution.fctObjectif;
+				}
+			}
 			rli.solution.getInFile();
-			System.out.println("Avant : "+avant+" ; apres : "+rli.solution.fctObjectif+" ; borne sup : "+borneSup);
+			System.out.println("Avant : "+avant+" ; apres : "+minFctObj+" ; borne sup : "+borneSup);
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
@@ -362,8 +372,8 @@ public class RLIntensification {
 	
 	
 	 public static void main(String[] args) {
-		 testInvalid();
-		// testDescente();
+		 //testInvalid();
+		testDescente();
 		 
 
 	 }

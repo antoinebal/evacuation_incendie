@@ -122,7 +122,8 @@ public class Checker {
 	}
 	
 	
-	public void setSolution(Solution solution) {
+	//change la foret et la solution
+	public void setSolutionEtForet(Solution solution) {
 		this.solution=solution;
 		FileAgent fa2 = new FileAgent("InstancesInt/"+solution.nomInstance+".full");
 		try {
@@ -132,6 +133,12 @@ public class Checker {
 			e.printStackTrace();
 		}
 		
+		noeuds.clear();
+	}
+	
+	//change la solution uniquement
+	public void setSolution(Solution solution) {
+		this.solution=solution;
 		noeuds.clear();
 	}
 	
@@ -325,12 +332,13 @@ public class Checker {
 				solution.fctObjectif = date;
 				//System.out.println(date);
 				solution.comment = "tchazzzou" ; 
+				return ok;
 			}
 				
 			} catch (NoSuchElementException e) {
 				e.printStackTrace();
 			}
-		
+			
 		}
 		return ok;
 		
