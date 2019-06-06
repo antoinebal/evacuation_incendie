@@ -13,7 +13,7 @@ public class RLDiversification {
 	int DELTA_RANGE_INF=50;
 	int DELTA_RANGE_SUP=300;
 	
-	//on ne s'autorise pas à générer des voisins
+	//on ne s'autorise pas à generer des voisins
 	//avec des seuils aussi bas car inefficace
 	static int SEUIL_MIN_RATE=7;
 	static int ITERATIONS_DIVERSIFICATION=50;
@@ -42,9 +42,9 @@ public class RLDiversification {
 	
 	
 	/*
-	 * génère des voisins : 
-	 * > contenant une date de départ inférieure pour un site
-	 * > contenant un taux inférieur pour un site
+	 * genere des voisins : 
+	 * > contenant une date de depart inferieure pour un site
+	 * > contenant un taux inferieur pour un site
 	 */
 	public ArrayList<Solution> genereVoisinage() {
 		ArrayList<Solution> voisinage = new ArrayList<Solution>();
@@ -68,7 +68,7 @@ public class RLDiversification {
 	
 	// Faire partir plus tot 
 	/*
-	 * si le delta produit une valeur négative, on retourne nul
+	 * si le delta produit une valeur negative, on retourne nul
 	 */
 	public Solution genereVoisinDate(int numeroFeuille, int delta) {
 		Solution newSolution = new Solution(solution) ; 
@@ -84,7 +84,7 @@ public class RLDiversification {
 		return null ; 
 	}
 	
-	//génère un voisin au taux de départ inférieur
+	//genere un voisin au taux de depart inferieur
 	public Solution genereVoisinRate(int numeroFeuille, int delta) {
 		Solution newSolution = new Solution(solution) ; 
 		Solution aux = newSolution;
@@ -93,7 +93,7 @@ public class RLDiversification {
 		// Reduire nombre paquet 
 		// Taux evac solution + delta <= maxPack de la feuille
 		if ((solution.feuilles.get(numeroFeuille).tauxEvac - delta >  SEUIL_MIN_RATE)) { 
-			//on enlève delta au rate de cette feuille
+			//on enleve delta au rate de cette feuille
 			newSolution.setRateFeuilleNo(numeroFeuille, delta); 
 			return newSolution;
 		}
@@ -114,7 +114,7 @@ public class RLDiversification {
 		while (!found) {
 		
 		ArrayList<Solution> voisins = genereVoisinage();
-		//on choisi un voisin aléatoire
+		//on choisi un voisin aleatoire
 		int indexAleatoire = randInt(0, voisins.size());
 		voisins.remove(indexAleatoire);
 		voisinChoisi = voisins.get(indexAleatoire);
@@ -146,10 +146,10 @@ public class RLDiversification {
 		
 		while (!found&&!voisins.isEmpty()) {
 			
-			//on choisit un voisin aléatoire
+			//on choisit un voisin aleatoire
 			int indexAleatoire = randInt(0, voisins.size()-1);
 			voisinChoisi = voisins.get(indexAleatoire);
-			//on l'enlève pour ne pas le choisir deux fois
+			//on l'enleve pour ne pas le choisir deux fois
 			voisins.remove(indexAleatoire);
 			checker.setSolution(voisinChoisi);
 			try {
@@ -201,14 +201,12 @@ public class RLDiversification {
 		RLDiversification rld = new RLDiversification(sBorneSup);
 		RLIntensification rli = new RLIntensification(sBorneSup, foret);
 		
-		System.out.println("****************** Intensification : " + nomInstance + "**********************");
 		Instant start = Instant.now();
 		rli.intensification();
 		Instant end = Instant.now();
 		int tpsIntensification = (int) Duration.between(start, end).toMillis();
 		
 		int meilleureFctObjLocale = rli.solution.fctObjectif;
-		System.out.println("****************** Diversification : " + nomInstance + "**********************");
 		Instant start2 = Instant.now();
 		Solution sDiv = rld.diversification(rli.solution, 1, 0);
 		Instant end2 = Instant.now();
@@ -232,7 +230,7 @@ public class RLDiversification {
 			foDiv=rli.solution.fctObjectif;
 		}
 		System.out.println(" RESULTAT FIN DE DIVERSIFICATION POUR : " + nomInstance);
-		System.out.println("Borne INF : "+sBorneInf.fctObjectif + " ; Après une intensification : "+meilleureFctObjLocale+" ; Après diversification "+foDiv+ "Borne SUP : "+sBorneSup.fctObjectif);
+		System.out.println("Borne INF : "+sBorneInf.fctObjectif + " ; Apres une intensification : "+meilleureFctObjLocale+" ; Apres diversification "+foDiv+ "Borne SUP : "+sBorneSup.fctObjectif);
 		System.out.println(" Pour un temps de calcul de : " + tpsIntensification + " ms pour l'intensification " + tpsDiversification + "ms pour la diversification , soit un temps de calcul total de : "+ tpsTotal + " ms ");
 	
 	

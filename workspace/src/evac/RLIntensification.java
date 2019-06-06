@@ -166,7 +166,7 @@ public class RLIntensification {
 			}
 			//si aucun voisin meilleur trouvé, on arrête
 			if (indexMeilleurVoisin == -1) {
-				System.out.println("Descente finie ; meilleure solution : "+solution.fctObjectif);
+				// DEBUG System.out.println("Descente finie ; meilleure solution : "+solution.fctObjectif);
 				over=true;
 			} else {
 			//sinon le meilleur voisin devient la nouvelle solution
@@ -237,7 +237,7 @@ public class RLIntensification {
 			fluxCorr = fluxCorr - rate+nouveauRate;
 			if (fluxCorr <= capacite) {
 				over=true;
-				System.out.println("Trouvé : "+fluxCorr);
+				System.out.println("Trouve : "+fluxCorr);
 				return newSolution;
 				
 			}
@@ -330,12 +330,12 @@ public class RLIntensification {
 			rli.intensification();
 			Instant end = Instant.now();
 			rli.solution.tpsCalcul = (int) Duration.between(start, end).toMillis();
-			rli.solution.methode ="Intensification depuis la borne supérieure" ;
+			rli.solution.methode ="Intensification depuis la borne superieure" ;
 			rli.solution.comment = "Intensification normale " ; 
 			
 			rli.solution.getInFile();
 			System.out.println(" RESULTAT FIN D'INTENSIFICATION POUR : " + nomInstance);
-			System.out.println("Borne inf : "+sBorneInf.fctObjectif+" ; après descente : "+rli.solution.fctObjectif + "  ;  Borne sup : " + vBorneSup);
+			System.out.println("Borne inf : "+sBorneInf.fctObjectif+" ; apres descente : "+rli.solution.fctObjectif + "  ;  Borne sup : " + vBorneSup);
 			System.out.println(" Pour un temps de calcul de : " + rli.solution.tpsCalcul + " ms ");
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
