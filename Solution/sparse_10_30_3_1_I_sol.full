@@ -6,12 +6,12 @@ sparse_10_30_3_1_I
 128 134 170
 130 206 223
 134 72 266
-177 71 343
-190 74 397
-77 206 508
-138 206 566
+177 71 259
+190 74 242
+77 206 238
+138 206 241
 valid
-602
-7
-execution basique du calcul de borne supérieure 
-calcul borne SUP
+353
+13961
+Intensification depuis la borne supérieure
+Intensification normale 

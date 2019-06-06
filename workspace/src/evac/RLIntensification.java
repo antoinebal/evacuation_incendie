@@ -1,6 +1,8 @@
 package evac;
 
 import java.io.IOException;
+import java.time.Duration;
+import java.time.Instant;
 import java.util.Random;
 import java.util.ArrayList;
 
@@ -141,7 +143,7 @@ public class RLIntensification {
 		while (!over) {
 			compteur++;
 			ArrayList<Solution> voisins = genereVoisinage();
-			System.out.println("Amas num : "+compteur);
+			// DEBUG System.out.println("Amas num : "+compteur);
 			
 			int minFctObj = solution.fctObjectif;
 			int indexMeilleurVoisin = -1;
@@ -155,7 +157,7 @@ public class RLIntensification {
 							//ce voisin valide est le meilleur
 							minFctObj = voisins.get(i).fctObjectif;
 							indexMeilleurVoisin = i;
-							System.out.println("\n\n\nMeilleur voisin pris : "+minFctObj);
+							// DEBUG System.out.println("\n\n\nMeilleur voisin pris : "+minFctObj);
 						}
 					}
 				} catch (SolutionIncorrecteException e) {
@@ -306,32 +308,35 @@ public class RLIntensification {
 	    return randomNum;
 	}
 	
-	static void testDescente() {
+	static void testDescente(String nomInstance) {
 		try {
-		 	String nomInstance = "dense_10_30_3_10_I" ; 
 		 	
 			FileAgent fa = new FileAgent("InstancesInt/"+nomInstance+".full");
 			Foret foret=fa.processLineByLineForest();
 			
-			BorneCalc testBorneSup = new BorneCalc (foret) ;
-			
-			Solution sBorneSup = testBorneSup.borneSolution(nomInstance,1);
-			
+			BorneCalc testBorne = new BorneCalc (foret) ;
+			Solution sBorneSup = testBorne.borneSolution(nomInstance,1);
+			Solution sBorneInf = testBorne.borneSolution(nomInstance, 0); 
 			sBorneSup.comment = "calcul borne SUP";
-			sBorneSup.getInFile();
-			
+			sBorneSup.getInFile(); 
 			int vBorneSup = sBorneSup.fctObjectif;
-			
 			/*Checker checkert = new Checker(testBorneSup.borneSolution(nomInstance,1)) ; 
 			boolean validite = checkert.checkSolution();
 		 	System.out.println(validite);*/
-		 	
+			System.out.println("******************************************************* Nouvelle instance pour intensification : " + nomInstance + "*****************************************************");
 			RLIntensification rli = new RLIntensification("Solution/"+nomInstance+"_sol.full");
 			
+			Instant start = Instant.now();
 			rli.intensification();
+			Instant end = Instant.now();
+			rli.solution.tpsCalcul = (int) Duration.between(start, end).toMillis();
+			rli.solution.methode ="Intensification depuis la borne supérieure" ;
+			rli.solution.comment = "Intensification normale " ; 
 			
 			rli.solution.getInFile();
-			System.out.println("Borne sup : "+vBorneSup+" ; après descente : "+rli.solution.fctObjectif);
+			System.out.println(" RESULTAT FIN D'INTENSIFICATION POUR : " + nomInstance);
+			System.out.println("Borne inf : "+sBorneInf.fctObjectif+" ; après descente : "+rli.solution.fctObjectif + "  ;  Borne sup : " + vBorneSup);
+			System.out.println(" Pour un temps de calcul de : " + rli.solution.tpsCalcul + " ms ");
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -372,8 +377,8 @@ public class RLIntensification {
 	
 	
 	 public static void main(String[] args) {
-		 //testInvalid();
-		testDescente();
+		//testInvalid();
+		testDescente("dense_10_30_3_10_I");
 		 
 
 	 }

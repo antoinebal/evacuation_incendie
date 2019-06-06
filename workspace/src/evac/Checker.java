@@ -19,17 +19,17 @@ public class Checker {
 	
 	
     /*
-     * les évènements représentent un flux de personne sur
-     * un arc à un instant donné.
-     * Ils sont voués à être propagés de noeuds en noeuds,
-     * où ils sont rangés dans des AVL en fonction de leur date.
+     * les ï¿½vï¿½nements reprï¿½sentent un flux de personne sur
+     * un arc ï¿½ un instant donnï¿½.
+     * Ils sont vouï¿½s ï¿½ ï¿½tre propagï¿½s de noeuds en noeuds,
+     * oï¿½ ils sont rangï¿½s dans des AVL en fonction de leur date.
      */
 	public class Event { 
 		//le flux de personne
 		int nbPers ;
 		
 		/*
-		 * liste des ids des feuilles ayant contribué
+		 * liste des ids des feuilles ayant contribuï¿½
 		 * au flux de personnes de cet event.
 		 * Utile pour corriger des erreurs invalides
 		 */
@@ -41,10 +41,10 @@ public class Checker {
 			idFeuillesSource.add(idFeuilleSource);
 		}
 		
-		//rassembler deux évènement en un
+		//rassembler deux ï¿½vï¿½nement en un
 		void merge(Event e) {
 			this.nbPers+=e.nbPers;
-			//on concatène les listes de feuilles source
+			//on concatï¿½ne les listes de feuilles source
 			this.idFeuillesSource.addAll(e.idFeuillesSource);
 		}
 		
@@ -58,9 +58,9 @@ public class Checker {
 	
 	
 	/*
-	 * classe expréssément créée pour le checker.
-	 * Il s'en sert pour associer chaque noeud intermédiaire
-	 * à son AVL d'évènements
+	 * classe exprï¿½ssï¿½ment crï¿½ï¿½e pour le checker.
+	 * Il s'en sert pour associer chaque noeud intermï¿½diaire
+	 * ï¿½ son AVL d'ï¿½vï¿½nements
 	 */
 	public class Noeud {
 	private Sommet sommet;
@@ -98,8 +98,8 @@ public class Checker {
 	
 	
 	/*
-	 * renvoie son numéro dans la liste noeuds
-	 * si le noeud correspondant à sommet y est présent,
+	 * renvoie son numï¿½ro dans la liste noeuds
+	 * si le noeud correspondant ï¿½ sommet y est prï¿½sent,
 	 * retourne -1 sinon
 	 */
 	public int noeudExiste(Sommet sommet) {
@@ -119,7 +119,7 @@ public class Checker {
 		}
 	}
 	
-	//le checker construit la solution à partir du path
+	//le checker construit la solution ï¿½ partir du path
 	public Checker (String fileName){
 		    try {
 		    	//on construit la forÃªt et la solution
@@ -144,7 +144,7 @@ public class Checker {
 	}
 	
 	
-	//change la solution et met à jour la forêt
+	//change la solution et met ï¿½ jour la forï¿½t
 	public void setSolutionEtForet(Solution solution) {
 		this.solution=solution;
 		FileAgent fa2 = new FileAgent("InstancesInt/"+solution.nomInstance+".full");
@@ -165,33 +165,33 @@ public class Checker {
 	}
 	
 	/*
-	 * vérifie la validité de la solution en attribut du checker.
-	 * ce checker vérifie : 
+	 * vï¿½rifie la validitï¿½ de la solution en attribut du checker.
+	 * ce checker vï¿½rifie : 
 	 * > si le nombre de feuilles de la solution est correct
-	 * > si la solution n'induit pas de dépassements de capacités d'arcs
+	 * > si la solution n'induit pas de dï¿½passements de capacitï¿½s d'arcs
 	 */
-	//cette version de checkSolution établit elle même la fonction
-	//objectif sans vérifier celle déjà existante
+	//cette version de checkSolution ï¿½tablit elle mï¿½me la fonction
+	//objectif sans vï¿½rifier celle dï¿½jï¿½ existante
 	public boolean checkSolution() throws SolutionIncorrecteException {
 		boolean ok = true ; 
 		
 		//> le nombre de feuilles est il correct?
 		int date=0;
 		/*
-		 *  on vérifie simplement que le nombre de feuilles de la solution
-		 *  est bien inférieur ou égal au nombre de feuilles dans la forêt
+		 *  on vï¿½rifie simplement que le nombre de feuilles de la solution
+		 *  est bien infï¿½rieur ou ï¿½gal au nombre de feuilles dans la forï¿½t
 		 */
 		if (solution.nbFeuilleEvac > foret.nbFeuille) { 
 			ok = false ;
 			System.out.println("Erreur : nombre de feuilles Ã  Ã©vacuer plus grand que le nombre de feuilles de la forÃªt!");
 			throw new SolutionIncorrecteException();
 		}
-		//> une capacité est elle dépassée?
+		//> une capacitï¿½ est elle dï¿½passï¿½e?
 		else { 
 
 			/*
 			 * Etape 1 : on parcourt toutes les feuilles de la solution
-			 * et on crée tous les évènements
+			 * et on crï¿½e tous les ï¿½vï¿½nements
 			 */
 			try {
 			for (int i=0 ; i<solution.nbFeuilleEvac ; i++) { 
@@ -260,16 +260,16 @@ public class Checker {
 			} 
 			
 			/*
-			 * Etape 2 : maintenant que nous venons de créer tous les events,
-			 * les opérations suivantes vont être répétées jusqu'à ce que tous les AVL
-			 * soient vides (i.e. qu'il n'y ait plus aucun event à propager) ou qu'il
-			 * soit avéré que la solution est invalide.
+			 * Etape 2 : maintenant que nous venons de crï¿½er tous les events,
+			 * les opï¿½rations suivantes vont ï¿½tre rï¿½pï¿½tï¿½es jusqu'ï¿½ ce que tous les AVL
+			 * soient vides (i.e. qu'il n'y ait plus aucun event ï¿½ propager) ou qu'il
+			 * soit avï¿½rï¿½ que la solution est invalide.
 			 * 1. on cherche la date minimale parmi tous les events
-			 * 2. on parcourt la liste des noeuds intermédiaires : 
-			 * 		si leur AVL contient un event associé à la date
-			 * 		minimale, on vérifie que son flux ne dépasse pas
-			 * 		la capacité de l'arc liant son noeud au suivant.
-			 * 			si c'est le cas, on lève une SolutionIncorrecteException
+			 * 2. on parcourt la liste des noeuds intermï¿½diaires : 
+			 * 		si leur AVL contient un event associï¿½ ï¿½ la date
+			 * 		minimale, on vï¿½rifie que son flux ne dï¿½passe pas
+			 * 		la capacitï¿½ de l'arc liant son noeud au suivant.
+			 * 			si c'est le cas, on lï¿½ve une SolutionIncorrecteException
 			 * 			sinon, on le propage
 			 */
 			boolean avlPleins=true;
@@ -291,11 +291,11 @@ public class Checker {
 				}
 				
 				/*
-				 * 2. on parcourt la liste des noeuds intermédiaires : 
-				 * 		si leur AVL contient un event associé à la date
-				 * 		minimale, on vérifie que son flux ne dépasse pas
-				 * 		la capacité de l'arc liant son noeud au suivant.
-				 * 			si c'est le cas, on lève une SolutionIncorrecteException
+				 * 2. on parcourt la liste des noeuds intermï¿½diaires : 
+				 * 		si leur AVL contient un event associï¿½ ï¿½ la date
+				 * 		minimale, on vï¿½rifie que son flux ne dï¿½passe pas
+				 * 		la capacitï¿½ de l'arc liant son noeud au suivant.
+				 * 			si c'est le cas, on lï¿½ve une SolutionIncorrecteException
 				 * 			sinon, on le propage
 				 */
 				for (int i=0 ; i < noeuds.size() ; i++) {
@@ -360,7 +360,7 @@ public class Checker {
 				date++;
 				solution.fctObjectif = date;
 				solution.valid="valid";
-				System.out.println(date);
+				//System.out.println(date);
 				return ok;
 			}
 				

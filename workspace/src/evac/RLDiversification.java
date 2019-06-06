@@ -1,6 +1,8 @@
 package evac;
 
 import java.io.IOException;
+import java.time.Duration;
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Random;
 
@@ -181,6 +183,7 @@ public class RLDiversification {
 	static void rechercheLocale(String nomInstance) {
 		FileAgent fa = new FileAgent("InstancesInt/"+nomInstance+".full");
 		Foret foret=null;
+		System.out.println("******************************************************* Nouvelle instance pour intensification + diversification  : " + nomInstance + "*****************************************************");
 		try {
 			foret = fa.processLineByLineForest();
 		} catch (IOException e) {
@@ -191,31 +194,48 @@ public class RLDiversification {
 		BorneCalc BCSup = new BorneCalc (foret) ;
 		 
 		Solution sBorneSup = BCSup.borneSolution(nomInstance,1);
+		Solution sBorneInf = BCSup.borneSolution(nomInstance, 0) ;
 		sBorneSup.comment="calcul borne SUP";
 		sBorneSup.getInFile();
 	 
 		RLDiversification rld = new RLDiversification(sBorneSup);
 		RLIntensification rli = new RLIntensification(sBorneSup, foret);
 		
+		System.out.println("****************** Intensification : " + nomInstance + "**********************");
+		Instant start = Instant.now();
 		rli.intensification();
-		int meilleureFctObjLocale = rli.solution.fctObjectif;
+		Instant end = Instant.now();
+		int tpsIntensification = (int) Duration.between(start, end).toMillis();
 		
+		int meilleureFctObjLocale = rli.solution.fctObjectif;
+		System.out.println("****************** Diversification : " + nomInstance + "**********************");
+		Instant start2 = Instant.now();
 		Solution sDiv = rld.diversification(rli.solution, 1, 0);
+		Instant end2 = Instant.now();
+		int tpsDiversification = (int) Duration.between(start2, end2).toMillis();
+		int tpsTotal = tpsIntensification + tpsDiversification ; 
 		int foDiv=0;
 		if (sDiv!=null) {
 			/*
 			 * si la solution issue de la diversification est
 			 * meilleure, on la conserve
 			 */
+			sDiv.tpsCalcul = tpsTotal  ;
+			sDiv.comment = "intensification puis diversification" ; 
+			sDiv.methode = "DIVERSIFICATION" ;
 			sDiv.getInFile();
 			foDiv=sDiv.fctObjectif;
+			
 		} else {
 			//sinon on garde celle de l'intensification
 			rli.solution.getInFile();
 			foDiv=rli.solution.fctObjectif;
 		}
-		System.out.println("Borne sup : "+sBorneSup.fctObjectif+ " ; Après une int : "+meilleureFctObjLocale+" ; Après div "+foDiv);
-		 
+		System.out.println(" RESULTAT FIN DE DIVERSIFICATION POUR : " + nomInstance);
+		System.out.println("Borne INF : "+sBorneInf.fctObjectif + " ; Après une intensification : "+meilleureFctObjLocale+" ; Après diversification "+foDiv+ "Borne SUP : "+sBorneSup.fctObjectif);
+		System.out.println(" Pour un temps de calcul de : " + tpsIntensification + " ms pour l'intensification " + tpsDiversification + "ms pour la diversification , soit un temps de calcul total de : "+ tpsTotal + " ms ");
+	
+	
 		/*for (int i = 0 ; i < ITERATIONS_DIVERSIFICATION ; i++) {
 			Solution voisin = rld.diversification();
 			if (voisin != null) {
