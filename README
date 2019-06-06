@@ -1,0 +1,33 @@
+Etapes 1 
+
+Le parser : 
+
+Utilisation de FileAgent : 
+Construire un objet FileAgent avec le nom du fichier à parser
+et appeler les méthodes processLineByLineForest ou processLineByLineSolution
+en fonction du fichier à parser.
+
+Utilisation du Checker : 
+Construire un objet Checker et appeler la méthode checkSolution. checkSolution raise une SolutionIncorrecteException si la solution n'est pas valide (l'objet SolutionIncorrecteException contient quelques informations utiles sur la cause de non-validité de la solution, cf son code source). Si la solution est valide, renvoie vrai.
+
+Etape 2 : 
+
+Utilisation de BorneCalc : 
+Pour générer une Solution pour les bornes, utiliser la méthode borneSolution (String nomInstance, int borne). Mettre borne à 0 pour le calcul d'une borne inf et à 1 pour une borne sup.
+Comme tous les objets Solution, la Solution retournée par borneSolution est exportable dans un fichier avec la méthode getInFile(). Le fichier généré sera nommé "nom_instance_sol.full".
+
+
+Etape 3 : 
+
+Utilisation de RLIntensification : 
+Pour construire l'objet :
+RLIntensification rli = new RLIntensification("path_de_la_solution");
+Pour faire une intensification, appeler la méthode intensification().
+Si la solution donnée à à l'objet RLIntensification est valide, il va l'intensifiée, sinon, il va la corriger.
+
+
+Etape 4 : 
+
+La diversification : 
+
+Pour effectuer une recherche locale, il suffit d'appeler la méthode statique rechercheLocale("nom_de_l'instance");

@@ -208,7 +208,7 @@ public class RLDiversification {
 		
 		int meilleureFctObjLocale = rli.solution.fctObjectif;
 		Instant start2 = Instant.now();
-		Solution sDiv = rld.diversification(rli.solution, 1, 0);
+		Solution sDiv = rld.diversification(rli.solution, 2, 0);
 		Instant end2 = Instant.now();
 		int tpsDiversification = (int) Duration.between(start2, end2).toMillis();
 		int tpsTotal = tpsIntensification + tpsDiversification ; 
